@@ -1,1 +1,1 @@
-Aici lucreaza scalvi de pe front end
+Aici lucreaza scalvii de pe front end
