@@ -1,0 +1,58 @@
+.knife-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.knife {
+  font-size: 120px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  animation-timing-function: ease-in-out;
+}
+
+.knife-left {
+  left: -100px; /* Starts off-screen on the left */
+  animation: throwLeft 4s ease-in-out infinite; /* Increased duration for smoother effect */
+}
+
+.knife-right {
+  right: -100px; /* Starts off-screen on the right */
+  animation: throwRight 4s ease-in-out infinite; /* Increased duration for smoother effect */
+}
+
+@keyframes throwLeft {
+  0% {
+    left: -100px; /* Starts off-screen */
+    transform: translateY(-50%) rotate(0deg); /* Tail to the left, blade to the right */
+  }
+  45%, 55% {
+    left: 47%; /* Centered position */
+    transform: translateY(-50%) scale(1.1) rotate(100deg); /* Pause in the center with rotation reset */
+  }
+  100% {
+    left: 100%; /* Ends off-screen on the right */
+    transform: translateY(-50%) rotate(300deg); /* Tail to the right, blade to the left */
+  }
+}
+
+@keyframes throwRight {
+  0% {
+    right: -100px; /* Starts off-screen */
+    transform: translateY(-50%) rotate(-90deg); /* Tail to the right, blade to the left */
+  }
+  45%, 55% {
+    right: 47%; /* Centered position */
+    transform: translateY(-50%) scale(1.1) rotate(-15deg); /* Pause in the center with rotation reset */
+  }
+  100% {
+    right: 100%; /* Ends off-screen on the left */
+    transform: translateY(-50%) rotate(125deg); /* Tail to the left, blade to the right */
+  }
+}
