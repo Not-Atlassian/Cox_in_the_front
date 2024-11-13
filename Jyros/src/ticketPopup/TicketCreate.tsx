@@ -29,6 +29,11 @@ export default function TicketCreate() {
   const [parent, setParent] = useState("None");
   const [priority, setPriority] = useState("Medium");
 
+  const [teamName, setTeamName] = useState("Team A")
+  const [projectName, setProjectName] = useState("Project X")
+  const [featureName, setFeatureName] = useState("Feature Y")
+  const [epicName, setEpicName] = useState("Epic Z")
+  const [ticketName, setTicketName] = useState("Ticket #123")
 
   // Handlers for input fields
   const handleTitleChange = (e: { target: { value: SetStateAction<string> } }) =>
