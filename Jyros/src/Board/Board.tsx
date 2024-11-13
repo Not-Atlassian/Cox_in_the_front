@@ -16,6 +16,7 @@ import {
   SidebarProvider,
   SidebarInset,
 } from "@/components/ui/sidebar"
+import TicketCreate from '../ticketPopup/TicketCreate'
 
 interface Task {
   id: string
@@ -161,9 +162,10 @@ export default function Board() {
                   </Avatar>
                 ))}
               </div>
-              <Button>
+              {/* <Button onClick={()=>{return}}>
                 <Plus className="mr-2 h-4 w-4" /> Add Product
-              </Button>
+              </Button> */}
+              <TicketCreate />
             </div>
             <DragDropContext onDragEnd={onDragEnd}>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
