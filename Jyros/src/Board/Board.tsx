@@ -55,7 +55,7 @@ const initcolumns: ColumnState = {
   '4': { id: '4', title: 'Bonne appetit :3', tasks: [] },
 }
 
-export default function ProjectDashboard() {
+export default function Board() {
   const [columns, setColumns] = useState<ColumnState>(initcolumns);
 
   useEffect(() => {
