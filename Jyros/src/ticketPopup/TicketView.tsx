@@ -21,7 +21,7 @@ export default function TicketView() {
   const [reporter, setReporter] = useState("Mihai Eminescu")
   const [team, setTeam] = useState("NotAtlassian")
   const [shift, setShift] = useState("(To be implemented)")
-  const [storyPoints, setStoryPoints] = useState(5)
+  const [storyPlates, setStoryPlates] = useState(5)
   const [parent, setParent] = useState("blzbalbal bnlab")
   const [priority, setPriority] = useState("Select priority")
 
@@ -141,39 +141,23 @@ export default function TicketView() {
                 </div>
                 <div className="grid grid-cols-[100px,1fr] items-center gap-2">
                   <Label className="text-base">Team</Label>
-                  <Input
-                    value={team}
-                    onChange={(e) => setTeam(e.target.value)}
-                    className="h-8"
-                  />
+                  <span>{team}</span>
                 </div>
                 <div className="grid grid-cols-[100px,1fr] items-center gap-2">
                   <Label className="text-base">Shift</Label>
                   <span className="text-gray-600">{shift}</span>
                 </div>
                 <div className="grid grid-cols-[100px,1fr] items-center gap-2">
-                  <Label className="text-base">Story Points</Label>
-                  <Input
-                    type="number"
-                    value={storyPoints}
-                    onChange={(e) => setStoryPoints(Number(e.target.value))}
-                    className="h-8"
-                  />
+                  <Label className="text-base">Story Plates</Label>
+                  <span className="text-gray-600">{storyPlates}</span>
                 </div>
                 <div className="grid grid-cols-[100px,1fr] items-center gap-2">
                   <Label className="text-base">Parent</Label>
-                  <Input
-                    value={parent}
-                    onChange={(e) => setParent(e.target.value)}
-                    className="h-8"
-                  />
+                  <span>{parent}</span>
                 </div>
                 <div className="grid grid-cols-[100px,1fr] items-center gap-2">
                   <Label className="text-base">Priority</Label>
-                  <Button variant="outline" size="sm" className="w-full justify-between">
-                    <span>{priority}</span>
-                    <ChevronUp className="h-4 w-4" />
-                  </Button>
+                  <span>{priority}</span>
                 </div>
               </div>
             </div>
