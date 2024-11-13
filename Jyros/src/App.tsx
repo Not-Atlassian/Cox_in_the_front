@@ -1,12 +1,12 @@
-import './App.css'
+
 import TicketView from './ticketPopup/TicketView'
 import TicketCreate from './ticketPopup/TicketCreate'
+import Component from './components/Sidebar/jyrosSidebar'
 function App() {
 
   return (
-    <>
-      <TicketCreate />
-    </>
+    <Component />
+    
   )
 }
 
