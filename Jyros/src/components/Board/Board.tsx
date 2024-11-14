@@ -46,21 +46,37 @@ const Tasks = [
 ]
 
 const initcolumns: ColumnState = {
-  '1': { id: '1', title: 'To Do :3', tasks: [] },
-  '2': { id: '2', title: 'Cooking :3', tasks: [] },
-  '3': { id: '3', title: 'In Plating :3', tasks: [] },
-  '4': { id: '4', title: 'Bonne appetit :3', tasks: [] },
+  '1': { id: '1', title: 'To Do', tasks: [] },
+  '2': { id: '2', title: 'Cooking', tasks: [] },
+  '3': { id: '3', title: 'In Plating', tasks: [] },
+  '4': { id: '4', title: 'Bonne appetit', tasks: [] },
 }
 
 export default function Board() {
   const [columns, setColumns] = useState<ColumnState>(initcolumns);
 
+  // Function to update column titles with the task count dynamically
+  const updateColumnTitles = (columns: ColumnState) => { // New function added
+    const updatedColumns = Object.fromEntries(
+      Object.entries(columns).map(([id, column]) => [
+        id,
+        {
+          ...column,
+          title: `${column.title.split(' (')[0]} (${column.tasks.length})`, // Update title with dynamic task count
+        },
+      ])
+    );
+    setColumns(updatedColumns); // Set updated columns with task counts in the title
+  }
+
+
   useEffect(() => {
+    // Populate columns with tasks
     const columnsCopy = { ...initcolumns };
     Tasks.forEach((task) => {
-      columnsCopy[task.state].tasks.push(task);
+      columnsCopy[task.state].tasks.push(task); // Assign tasks to their respective columns
     });
-    setColumns(columnsCopy);
+    updateColumnTitles(columnsCopy); // Call to set initial titles with task counts
   }, []);
 
   const onDragEnd = (result: DropResult) => {
@@ -72,33 +88,38 @@ export default function Board() {
     const sourceTasks = [...sourceColumn.tasks];
     const destTasks = [...destColumn.tasks];
 
+
     if (source.droppableId === destination.droppableId) {
+      // Drag within the same column
       const [reorderedItem] = sourceTasks.splice(source.index, 1);
       sourceTasks.splice(destination.index, 0, reorderedItem);
-      setColumns({
+      const updatedColumns = {
         ...columns,
         [source.droppableId]: {
           ...sourceColumn,
           tasks: sourceTasks,
         },
-      });
+      };
+      updateColumnTitles(updatedColumns); // Update column titles
     } else {
-      const [movedItem] = sourceTasks.splice(source.index, 1);
-      movedItem.state = destination.droppableId; // Update the state of the moved task
-  
-      destTasks.splice(destination.index, 0, movedItem);
-      setColumns({
-        ...columns,
-        [source.droppableId]: {
-          ...sourceColumn,
-          tasks: sourceTasks,
-        },
-        [destination.droppableId]: {
-          ...destColumn,
-          tasks: destTasks,
-        },
-      });
-    }
+       // Drag across different columns
+       const [movedItem] = sourceTasks.splice(source.index, 1);
+       movedItem.state = destination.droppableId; // Update task state to reflect new column
+ 
+       destTasks.splice(destination.index, 0, movedItem);
+       const updatedColumns = {
+         ...columns,
+         [source.droppableId]: {
+           ...sourceColumn,
+           tasks: sourceTasks,
+         },
+         [destination.droppableId]: {
+           ...destColumn,
+           tasks: destTasks,
+         },
+       };
+       updateColumnTitles(updatedColumns); // Update titles in both columns after task movement
+     }
     
   };
 
@@ -130,7 +151,7 @@ export default function Board() {
                     {(provided) => (
                       <Card {...provided.droppableProps} ref={provided.innerRef}>
                         <CardHeader>
-                          <CardTitle>{column.title}</CardTitle>
+                          <CardTitle>{column.title}</CardTitle> 
                         </CardHeader>
                         <CardContent className="space-y-4">
                           {column.tasks.map((task, index) => (
