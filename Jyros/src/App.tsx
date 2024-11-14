@@ -12,6 +12,9 @@ interface AppContextType {
 // Create the context with the correct type
 export const AppContext = createContext<AppContextType | undefined>(undefined)
 
+import TicketView from './ticketPopup/TicketView'
+import TicketCreate from './ticketPopup/TicketCreate'
+import Board from './components/Board/Board'
 function App() {
   const [taskList, setTaskList] = useState<any[]>([])
 
