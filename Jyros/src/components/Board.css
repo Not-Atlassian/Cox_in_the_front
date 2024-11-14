@@ -1,0 +1,17 @@
+.board-page {
+  display: flex;
+  height: 100vh;
+}
+
+.board {
+    display: flex;
+    justify-content: space-between;
+    gap: 3%;
+  }
+  
+  .board-card {
+    display: flex;
+    flex-direction: column;
+    background-color: lightgrey;
+  }
+  
