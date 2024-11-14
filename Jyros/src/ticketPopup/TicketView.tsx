@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { ChevronLeft, ChevronUp, Zap, Trash } from "lucide-react"
 
-export default function TicketView() {
+export default function TicketView({id, handleClose}: {id: number, handleClose: () => void}) {
   const [ticketTitle, setTicketTitle] = useState("BLA BLA BLA BLA BLA BLA bla bla bla bal bal abl")
   const [ticketDescription, setTicketDescription] = useState("This is an example of a ticket description. This is an example of a ticket description. This is an example of a ticket description.")
   const [comment, setComment] = useState("")
@@ -24,6 +24,7 @@ export default function TicketView() {
   const [storyPlates, setStoryPlates] = useState(5)
   const [parent, setParent] = useState("blzbalbal bnlab")
   const [priority, setPriority] = useState("Select priority")
+  const [status, setStatus] = useState("To Do")
 
   const [teamName, setTeamName] = useState("Team A")
   const [projectName, setProjectName] = useState("Project X")
@@ -31,10 +32,30 @@ export default function TicketView() {
   const [epicName, setEpicName] = useState("Epic Z")
   const [ticketName, setTicketName] = useState("Ticket #123")
 
+  useEffect(() => {
+    const asyncFunc = async () => {
+      const response = await fetch(`http://localhost:5047/api/Ticket?id=${id}`);
+      if(!response.ok) {
+        console.error("Error fetching ticket data");
+        return;
+      }
+      const data = await response.json();
+      setTicketTitle(data[0].title);
+      setTicketDescription(data[0].description);
+      setStoryPlates(data[0].storyPoints);
+      setStatus(data[0].status);
+    };
+    asyncFunc();
+  }, [id])
+
   const handleDeleteTicket = () => {
     console.log("Ticket deleted");
     // Add the logic for ticket deletion here
     // For example, you could call an API to delete the ticket or set a state to remove the ticket
+    fetch(`http://localhost:5047/api/Ticket?id=${id}`, {
+      method: "DELETE",
+    });
+    handleClose();
   }
 
   const handleEstimateAI = () => {
@@ -46,8 +67,8 @@ export default function TicketView() {
   }
 
   return (
-    <Dialog defaultOpen>
-      <DialogContent className="max-w-4xl p-0">
+    <Dialog defaultOpen onOpenChange={(open)=>{if(!open) handleClose()}}>
+      <DialogContent className="max-w-4xl p-0 [&>button]:hidden">
         <DialogHeader className="p-4 bg-[#F8F9FA]">
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <Button variant="ghost" size="icon" className="h-8 w-8 bg-[#212529] text-white rounded-md hover:bg-[#343A40]">
