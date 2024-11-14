@@ -17,6 +17,8 @@ import { ArrowLeft, ChevronDown, MoreVertical, Plus, Zap } from 'lucide-react'
 import { Utensils, UtensilsCrossed } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import CrossingKnives from "./AnimationKnives/CrossingKnives"
+import EstimationPopup from "./EstimationPopup"
+import { DialogTitle } from "@radix-ui/react-dialog"
 
 const ForkIcon = () => (
   <svg
@@ -49,6 +51,9 @@ export default function Component() {
   const [parent, setParent] = useState("None")
   const [priority, setPriority] = useState("Select priority")
   const [status, setStatus] = useState("To Do")
+
+  const [openEstimateDialog, setOpenEstimateDialog] = useState(false);
+  
 
   const handlePriorityChange = (value: string) => setPriority(value)
   const handleStatusChange = (value: string) => setStatus(value)
@@ -112,6 +117,10 @@ export default function Component() {
     setOpen(false)
   }
 
+  const handleExitEstimate = () => {
+    setOpenEstimateDialog(false);
+  }
+  
   return (
     <>
       <div className={`p-4 ${showAnimation ? "opacity-10" : ""}`}>
@@ -144,12 +153,22 @@ export default function Component() {
               />
               <div className="flex items-center justify-between mb-6">
                 <div className="flex gap-2">
+                  <Dialog open={openEstimateDialog} onOpenChange={setOpenEstimateDialog}>
+                    <DialogTrigger asChild>
+                      <Button variant="secondary" size="sm" className="bg-[#F1F3F5] hover:bg-[#E9ECEF] text-gray-700">
+                        <ChevronDown className="h-3 w-3" />
+                        <Zap className="mr-2 h-3 w-3" />
+                        <DialogTitle>
+                        Estimate with AI
+                        </DialogTitle>
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="p-4">
+                      <EstimationPopup title = {title} description = {description} handleExit = {handleExitEstimate} setStoryPlates = {setStoryPlates} />
+                    </DialogContent>
+                  </Dialog>
                   <Button variant="secondary" size="sm" className="bg-[#F1F3F5] hover:bg-[#E9ECEF] text-gray-700">
-                    <Zap className="mr-2 h-3 w-3" />
-                    Estimate with AI
-                  </Button>
-                  <Button variant="secondary" size="sm" className="bg-[#F1F3F5] hover:bg-[#E9ECEF] text-gray-700">
-                    Planning Poker
+                      Planning Poker
                   </Button>
                 </div>
                 <Select value={status} onValueChange={handleStatusChange}>
