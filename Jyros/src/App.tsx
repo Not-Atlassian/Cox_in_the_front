@@ -1,12 +1,12 @@
-import './App.css'
+
 import TicketView from './ticketPopup/TicketView'
 import TicketCreate from './ticketPopup/TicketCreate'
+import Board from './components/Board/Board'
 function App() {
 
   return (
-    <>
-      <TicketCreate />
-    </>
+    <Board />
+    
   )
 }
 
