@@ -7,16 +7,12 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
   SidebarProvider,
   SidebarInset,
 } from "@/components/ui/sidebar"
 import TicketCreate from '../ticketPopup/TicketCreate'
+import TeamMates from '@/components/TeamMates/TeamMates'
+import SideBar from '@/components/Shared/SideBar/SideBar'
 
 interface Task {
   id: string
@@ -109,38 +105,7 @@ export default function Board() {
   return (
     <SidebarProvider>
       <div className="flex h-screen">
-        <Sidebar className="w-64 border-r">
-          <SidebarHeader className="border-b p-4 pl-6">
-            <div className="flex items-center gap-3">
-              <Avatar className="h-10 w-10">
-                <AvatarFallback className="bg-primary text-primary-foreground text-lg">TN</AvatarFallback>
-              </Avatar>
-              <span className="font-semibold text-xl">Team Name</span>
-            </div>
-          </SidebarHeader>
-          <SidebarContent className="pl-6">
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton className="justify-start text-base">
-                  <ClipboardList className="h-5 w-5 mr-3" />
-                  <span>Backlog</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton className="justify-start text-base" isActive>
-                  <Archive className="h-5 w-5 mr-3" />
-                  <span>Board</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton className="justify-start text-base">
-                  <Users className="h-5 w-5 mr-3" />
-                  <span>Availability</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarContent>
-        </Sidebar>
+        <SideBar />
         <SidebarInset className="flex-1 overflow-auto">
           <header className="flex items-center justify-between border-b p-4">
             <div className="flex items-center gap-2">
@@ -155,16 +120,7 @@ export default function Board() {
           </header>
           <main className="p-6">
             <div className="mb-6 flex items-center justify-between">
-              <div className="flex -space-x-2">
-                {[...Array(4)].map((_, i) => (
-                  <Avatar key={i} className="border-2 border-background">
-                    <AvatarFallback>U{i + 1}</AvatarFallback>
-                  </Avatar>
-                ))}
-              </div>
-              {/* <Button onClick={()=>{return}}>
-                <Plus className="mr-2 h-4 w-4" /> Add Product
-              </Button> */}
+              <TeamMates teamId={1}/>
               <TicketCreate />
             </div>
             <DragDropContext onDragEnd={onDragEnd}>
