@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { ArrowUpDown, ChevronDown, ChevronUp } from 'lucide-react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Utensils, UtensilsCrossed } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
 import { ChevronDownCircle } from "@mynaui/icons-react";
@@ -15,6 +16,25 @@ import {
 import SearchBar from '@/components/SearchBar/SearchBar'
 
 import './TaskTable.css'
+import { Item } from '@radix-ui/react-dropdown-menu'
+import { Badge } from '../ui/badge'
+
+const ForkIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="25"
+    height="25"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
+    <path d="M7 2v20" />
+  </svg>
+)
 
 const tasks = [
   { task: 'Task 1', title: 'Title 1', priority: 1, status: 'Done' },
@@ -129,27 +149,34 @@ export default function FilterableTaskTable() {
   return (
     <div className="space-y-4">
       {/* Search Bar */}
-      <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+      <div className="search-dropdown-div">
+        <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+        <div className='dropdown-div'>
+        <DropdownMenu onOpenChange={setIsOpen}>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="w-[150px] justify-between">
+              Filter by
+              {isOpen ? <ChevronUp className="ml-2 h-4 w-4" /> : <ChevronDown className="ml-2 h-4 w-4" />}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56">
+            {filterList.map((filter) => (
+              <DropdownMenuCheckboxItem
+                key={filter}
+                checked={selectedFilters[filter] || false}
+                onCheckedChange={(isChecked) => handleFilterChange(filter, isChecked)}
+              >
+                {filter}
+              </DropdownMenuCheckboxItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
 
-      <DropdownMenu onOpenChange={setIsOpen}>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="w-[150px] justify-between">
-            Filter by
-            {isOpen ? <ChevronUp className="ml-2 h-4 w-4" /> : <ChevronDown className="ml-2 h-4 w-4" />}
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56">
-          {filterList.map((filter) => (
-            <DropdownMenuCheckboxItem
-              key={filter}
-              checked={selectedFilters[filter] || false}
-              onCheckedChange={(isChecked) => handleFilterChange(filter, isChecked)}
-            >
-              {filter}
-            </DropdownMenuCheckboxItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
+        </div>
+        
+
+      </div>
+      
 
       <Table className="task-table">
         <TableHeader>
@@ -185,11 +212,20 @@ export default function FilterableTaskTable() {
                 {task.task}
               </TableCell>
               <TableCell>{task.title}</TableCell>
-              <TableCell>{task.priority}</TableCell>
+              <TableCell>
+                {task.priority == 1 ? <ForkIcon/> : task.priority == 2 ? <Utensils/> : <UtensilsCrossed/>}
+              </TableCell>
               <TableCell className='status-cell'>
+
+              <Badge variant="outline" className="bg-green-300 mr-4 w-200">
+                Parent
+              </Badge>
               <div className={`${getStatusClass(task.status)} status-div`}>
-                  {task.status}<ChevronDownCircle />
+                  {task.status} 
+                  <ChevronDownCircle />
+                 
                 </div>
+                <img className="user-logo" src="src/assets/user_logo.png"></img>
               </TableCell>
             </TableRow>
           ))}

@@ -4,11 +4,11 @@ import  TaskTable  from "@/components/TaskTable/TaskTable"
 import SearchBar from "@/components/SearchBar/SearchBar"
 import FilterDropDown from "@/components/FilterDropdown/FilterDropdown"
 import { useContext, useState } from "react"
-<<<<<<< Updated upstream
-=======
 import SideBar from "@/components/Shared/SideBar/SideBar"
 import { SidebarProvider } from "@/components/ui/sidebar"
->>>>>>> Stashed changes
+import TeamMates from "@/components/TeamMates/TeamMates"
+import TicketCreate from "@/ticketPopup/TicketCreate"
+
 
 const BacklogPage = () => {
   // const [taskList, setTaskList] = useContext<any[]>(ppCotext)
@@ -23,14 +23,26 @@ const BacklogPage = () => {
       {/* <SearchBar searchQuery={search} setSearchQuery={setSearch} /> */}
 
       {/* Task Table, passing filtered and searched taskList */}
-<<<<<<< Updated upstream
-=======
-      <SidebarProvider>
-        <SideBar/>
-      </SidebarProvider>
+      <div>
+        <SidebarProvider>
+          <div>
+            <SideBar/>
+          </div>
+          <div style={{"marginLeft":"5rem"}}>
+            <TaskTable/>
+          </div>
+
+  
+
+        </SidebarProvider>
+        
+  
+        
+
+      </div>
       
->>>>>>> Stashed changes
-      <TaskTable/>
+      
+      
     </>
   )
 }

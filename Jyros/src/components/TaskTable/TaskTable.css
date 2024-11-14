@@ -94,3 +94,21 @@
   background-color: #9ca3af; /* Light gray */
   color: #000;
 }
+
+.search-dropdown-div{
+  display: flex;
+  margin-top: 100px;
+}
+
+.dropdown-div{  
+  margin-top: 10px;
+  margin-left: 50px;
+}
+
+.user-logo{
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  margin-left: 1rem;
+  margin-top: 3px;
+}
