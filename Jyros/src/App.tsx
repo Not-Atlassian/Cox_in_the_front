@@ -1,22 +1,12 @@
-import './css/App.css'
-import TeamMates from './components/TeamMates/TeamMates'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import BoardPageSkibidi from './components/boardPageSkibidi'
-import { SidebarProvider, SidebarTrigger } from './components/ui/sidebar'
-import Component from './components/taskboard'
 
-const App = () => {
+import TicketView from './ticketPopup/TicketView'
+import TicketCreate from './ticketPopup/TicketCreate'
+import Board from './Board/Board'
+function App() {
 
   return (
-    <>
-    <SidebarProvider>    
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Component />} />
-        </Routes>
-      </BrowserRouter>
-      </SidebarProvider>
-    </>
+    <Board />
+    
   )
 }
 
