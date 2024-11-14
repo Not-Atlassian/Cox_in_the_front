@@ -7,6 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Utensils, ChevronLeft, MoreVertical, Plus } from 'lucide-react'
+import TeamMates from './TeamMates/TeamMates'
 
 interface Task {
   id: string
@@ -23,13 +24,6 @@ interface Column {
 }
 
 export default function Component() {
-  const teamMembers = [
-    { id: 1, name: "Team Member 1" },
-    { id: 2, name: "Team Member 2" },
-    { id: 3, name: "Team Member 3" },
-    { id: 4, name: "Team Member 4" },
-  ]
-
   const initialColumns: Column[] = [
     {
       id: "todo",
@@ -150,14 +144,7 @@ export default function Component() {
         {/* Team Members and Add Product */}
         <div className="p-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">Team Mates:</span>
-            <div className="flex -space-x-2">
-              {teamMembers.map((member) => (
-                <Avatar key={member.id} className="border-2 border-background">
-                  <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
-                </Avatar>
-              ))}
-            </div>
+          <TeamMates teamId={1}></TeamMates>
           </div>
           <Button variant="outline" className="gap-2">
             <Plus className="h-4 w-4" /> Add Product

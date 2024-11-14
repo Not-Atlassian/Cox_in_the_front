@@ -9,14 +9,7 @@ const App = () => {
 
   return (
     <>
-<<<<<<< HEAD
-      <TeamMates teamId={1}></TeamMates>
-    <SidebarProvider>
-    
-=======
-      <TeamMates></TeamMates>
     <SidebarProvider>    
->>>>>>> 49ec6ed156047c8a0892002dc50746f5de01e902
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Component />} />
