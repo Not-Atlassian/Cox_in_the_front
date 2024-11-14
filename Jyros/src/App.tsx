@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, Dispatch, SetStateAction } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import './App.css'
+
 import BacklogPage from './pages/BacklogPage'
 
 // Define the type for the context
