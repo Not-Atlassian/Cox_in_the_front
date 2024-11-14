@@ -10,6 +10,8 @@
     height: 100%;
     display: block;
     border-radius: 50%;
+    margin-right: 0.5em;
+    margin-left: 0.5em;
   }
   
   .user-logo-hover-text {

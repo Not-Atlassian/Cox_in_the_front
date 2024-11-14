@@ -11,7 +11,7 @@ const App = () => {
 
   return (
     <>
-      <TeamMates></TeamMates>
+      <TeamMates teamId={1}></TeamMates>
     <SidebarProvider>
     
       <BrowserRouter>
