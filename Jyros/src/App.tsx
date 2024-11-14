@@ -1,7 +1,7 @@
 
 import TicketView from './ticketPopup/TicketView'
 import TicketCreate from './ticketPopup/TicketCreate'
-import Board from './Board/Board'
+import Board from './components/Board/Board'
 function App() {
 
   return (
