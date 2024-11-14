@@ -1,0 +1,58 @@
+.filter-menu{
+  background-color: white;
+  border: 1px solid #d6d4d4;
+  width: 200px;
+  height: 40px;
+  padding: 0%;
+  padding-left: 10px;
+  text-align:start;
+  font-weight: 400; /*Optional: change font, font weight or font-size*/
+}
+
+.filter-item{
+  width: 200px;
+}
+
+.filter-text {
+  display: flex;
+  align-items: center; /* Centers text and icon vertically */
+}
+
+.chevron-icon {
+  margin-left: 100px; /* Adjust spacing between text and icon */
+}
+
+.custom-checkbox {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  /* margin-bottom: 5px; */
+  margin-right: 10px;
+  background-color: white;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  position: relative;
+  /* display: block; */
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.custom-checkbox[data-state="checked"] {
+  background-color: black; /* Background color when checked */
+  border-color: black; /* Border color when checked */
+}
+
+/* Add a tick mark with CSS */
+.custom-checkbox[data-state="checked"] .indicator::after {
+  content: "";
+  position: absolute;
+  width: 5px;
+  height: 10px;
+  border-right: 2px solid white;
+  border-bottom: 2px solid white;
+  top: 3px;
+  left: 6px;
+  transform: rotate(45deg);
+}
