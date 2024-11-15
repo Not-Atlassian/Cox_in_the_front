@@ -1,48 +1,32 @@
-import { AppContext } from "@/App"
-import { Input } from "@/components/ui/input"
-import  TaskTable  from "@/components/TaskTable/TaskTable"
-import SearchBar from "@/components/SearchBar/SearchBar"
-import FilterDropDown from "@/components/FilterDropdown/FilterDropdown"
-import { useContext, useState } from "react"
+import TaskTable from "@/components/TaskTable/TaskTable"
 import SideBar from "@/components/Shared/SideBar/SideBar"
-import { SidebarProvider } from "@/components/ui/sidebar"
-import TeamMates from "@/components/TeamMates/TeamMates"
-import TicketCreate from "@/ticketPopup/TicketCreate"
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
+import { Button } from "@/components/ui/button"
+import { MoreVertical } from "lucide-react"
 
 
 const BacklogPage = () => {
-  // const [taskList, setTaskList] = useContext<any[]>(ppCotext)
-  // const [taskList, setTaskList] = useState<any[]>([])
-  // const [search, setSearch] = useState<string>("")
-  // const [filter, setFilter] = useState<string>("")
-  // const [filterList, setFilterList] = useState<any[]>([])
 
   return (
     <>
-      {/* Search and Filter Components */}
-      {/* <SearchBar searchQuery={search} setSearchQuery={setSearch} /> */}
-
-      {/* Task Table, passing filtered and searched taskList */}
       <div>
         <SidebarProvider>
-          <div>
-            <SideBar/>
-          </div>
-          <div style={{"marginLeft":"5rem"}}>
-            <TaskTable/>
-          </div>
-
-  
-
+          <SideBar />
+          <SidebarInset className="flex-1 overflow-auto">
+            <header className="flex items-center justify-between border-b p-4">
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl font-semibold">Team Name/ Project Name/ Backlog</h1>
+              </div>
+              <Button variant="ghost" size="icon">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </header>
+            <div style={{ "marginLeft": "5rem" }}>
+              <TaskTable />
+            </div>
+          </SidebarInset>
         </SidebarProvider>
-        
-  
-        
-
       </div>
-      
-      
-      
     </>
   )
 }

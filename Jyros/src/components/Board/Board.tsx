@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd'
-import { Archive, ChevronLeft, ClipboardList, MoreVertical, Plus, Users, Utensils } from 'lucide-react'
+import { MoreVertical, Utensils } from 'lucide-react'
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -83,6 +83,9 @@ export default function Board() {
       });
 
       const columnsCopy = { ...initcolumns };
+      Object.values(columnsCopy).forEach((column) => {
+        column.tasks = [];
+      });
       Tasks.forEach((task) => {
         columnsCopy[task.state].tasks.push(task);
       });
@@ -146,9 +149,6 @@ export default function Board() {
         <SidebarInset className="flex-1 overflow-auto">
           <header className="flex items-center justify-between border-b p-4">
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon">
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
               <h1 className="text-xl font-semibold">Team Name/ Project Name/ Board</h1>
             </div>
             <Button variant="ghost" size="icon">
