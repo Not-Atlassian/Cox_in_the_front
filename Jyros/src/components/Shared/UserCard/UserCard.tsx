@@ -1,12 +1,12 @@
 import { useEffect } from "react";
 import "./UserCard.css";
-const UserCard = ({ hoverName }: { hoverName: string }) => {
+const UserCard = ({ hoverName }: { hoverName?: string }) => {
     const id=`user-${hoverName}`;
     useEffect(() => {
         const hoverElement = document.getElementById(id);
         const hoverText = document.getElementById(`${id}-hover-text`);
     
-        if (hoverElement && hoverText) {
+        if (hoverElement && hoverText && hoverName) {
           const handleMouseEnter = () => {
             hoverText.style.display = 'block';
           };
@@ -24,6 +24,14 @@ const UserCard = ({ hoverName }: { hoverName: string }) => {
           };
         }
       }, [id]);
+      if(hoverName === undefined){
+        return (<div className="user-card">
+        <img className="user-logo" id={`user-${hoverName}`} src="src/assets/user_logo.png">
+            
+        </img>
+        </div>
+    )
+      }
     return (<div className="user-card">
         <img className="user-logo" id={`user-${hoverName}`} src="src/assets/user_logo.png">
             

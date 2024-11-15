@@ -16,8 +16,8 @@ import {
 import SearchBar from '@/components/SearchBar/SearchBar'
 
 import './TaskTable.css'
-import { Item } from '@radix-ui/react-dropdown-menu'
 import { Badge } from '../ui/badge'
+import UserCard from '../Shared/UserCard/UserCard'
 
 const ForkIcon = () => (
   <svg
@@ -225,7 +225,7 @@ export default function FilterableTaskTable() {
                   <ChevronDownCircle />
                  
                 </div>
-                <img className="user-logo" src="src/assets/user_logo.png"></img>
+                <UserCard hoverName="Thomas"></UserCard>
               </TableCell>
             </TableRow>
           ))}

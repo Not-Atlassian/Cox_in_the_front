@@ -22,7 +22,9 @@ function App() {
     <AppContext.Provider value={{ taskList, setTaskList }}>
       <BrowserRouter>
         <Routes>
-          <Route path={"/"} element={<BacklogPage/>} />
+          <Route path={"/"} element={<Navigate to={"/board"} />} />
+          <Route path={"/board"} element={<Board/>} />
+          <Route path={"/backlog"} element={<BacklogPage/>} />
         </Routes>
       </BrowserRouter>
     </AppContext.Provider>
