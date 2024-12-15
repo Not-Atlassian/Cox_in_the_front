@@ -29,7 +29,7 @@ const EstimationPopup = ({ title, description, handleExit, setStoryPlates }: {
         const asyncfunc =  async  () => {
             let displayMessage = "";
         if(title !== ""){
-            const response = await fetch(`http://localhost:5047/api/Ticket/EstimateStoryPoints?title=${title}&description=${description}`);
+            const response = await fetch(`http://localhost:7048/api/Ticket/EstimateStoryPoints?title=${title}&description=${description}`);
             const data = await response.json();
             setEstimation(data);
         }

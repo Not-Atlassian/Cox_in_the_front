@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -12,6 +12,9 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { ChevronLeft, ChevronUp, Zap, Trash } from "lucide-react"
+
+import { AppContext } from "@/context/AppContext"
+import { Context } from "vm"
 
 export default function TicketView({id, handleClose}: {id: number, handleClose: () => void}) {
   const [ticketTitle, setTicketTitle] = useState("BLA BLA BLA BLA BLA BLA bla bla bla bal bal abl")
@@ -32,29 +35,33 @@ export default function TicketView({id, handleClose}: {id: number, handleClose: 
   const [epicName, setEpicName] = useState("Epic Z")
   const [ticketName, setTicketName] = useState("Ticket #123")
 
+  const context = useContext(AppContext);
+  const { removeTicket, fetchTicket, ticket } = context as Context;
+
   useEffect(() => {
-    const asyncFunc = async () => {
-      const response = await fetch(`http://localhost:5047/api/Ticket?id=${id}`);
-      if(!response.ok) {
-        console.error("Error fetching ticket data");
-        return;
-      }
-      const data = await response.json();
-      setTicketTitle(data[0].title);
-      setTicketDescription(data[0].description);
-      setStoryPlates(data[0].storyPoints);
-      setStatus(data[0].status);
+    const fetchData = async () => {
+      if(!ticket || ticket.id !== id)
+        await fetchTicket(id);
     };
-    asyncFunc();
-  }, [id])
+    fetchData();
+  },[id, fetchTicket])
+
+  useEffect(() => {
+    if (ticket) {
+      setTicketTitle(ticket.title);
+      setTicketDescription(ticket.description);
+      setStoryPlates(ticket.storyPoints);
+      setStatus(ticket.status);
+    } else {
+      console.log("Ticket not found");
+    }
+  }, []);
 
   const handleDeleteTicket = () => {
     console.log("Ticket deleted");
     // Add the logic for ticket deletion here
     // For example, you could call an API to delete the ticket or set a state to remove the ticket
-    fetch(`http://localhost:5047/api/Ticket?id=${id}`, {
-      method: "DELETE",
-    });
+    removeTicket(id);
     handleClose();
   }
 

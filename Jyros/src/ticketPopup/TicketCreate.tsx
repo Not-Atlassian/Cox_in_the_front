@@ -119,7 +119,7 @@ export default function Component() {
       status: status,
       storyPoints: storyPlates,
     };
-    fetch(`http://localhost:5047/api/Ticket`, {
+    fetch(`http://localhost:7048/api/Ticket`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
