@@ -357,7 +357,7 @@ export default function TicketView({ id, handleClose }: { id: number, handleClos
         <Dialog defaultOpen onOpenChange={(open) => { if (!open) cancelDelete3() }}>
           <DialogContent style={{ position: 'absolute', top: dialogPosition3.top, left: dialogPosition3.left }}>
             <DialogHeader>
-              <DialogTitle>Are you really sure ?</DialogTitle>
+              <DialogTitle>Are you really, really, reeeeaaally sure ?</DialogTitle>
             </DialogHeader>
             <DialogFooter>
               <Button variant="default" onClick={confirmDelete3}>Delete</Button>
