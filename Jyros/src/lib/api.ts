@@ -16,6 +16,14 @@ export const getTest = async () => {
   }
 };
 
+
+
+
+// --------------------------- Ticket API ---------------------------
+
+
+
+
 export const postTicket = async (data: any) => {
   try {
     const response = await api.post('/api/Ticket', data); // Replace '/test' with your actual endpoint
@@ -65,5 +73,31 @@ export const deleteTicket = async (ticketId: number) => {
     throw error;
   }
 }
+
+
+// --------------------------- User API ---------------------------
+
+export const getUsers = async () => {
+  try {
+    const response = await api.get('/api/User'); // Replace '/api/User' with your actual endpoint
+    console.log(response);
+    return response;
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    throw error;
+  }
+}
+
+export const getUser = async (userId: number) => {
+  try {
+    const response = await api.get(`/api/User/${userId}`); // Replace '/api/User' with your actual endpoint
+    return response;
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    throw error;
+  }
+}
+
+
 
 export default api;
