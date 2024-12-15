@@ -36,9 +36,9 @@ export const getTicket = async (ticketId: number) => {
   }
 }
 
-export const putTicket = async (ticketId: number, status: string) => {
+export const putTicketStatus = async (ticketId: number, status: string) => {
   try {
-    const response = await api.put(`/api/Ticket/${ticketId}`, { status }); // Replace '/api/Ticket' with your actual endpoint
+    const response = await api.put(`/api/Ticket/${ticketId}/status`, { status }); // Replace '/api/Ticket' with your actual endpoint
     return response;
   } catch (error) {
     console.error('Error updating ticket:', error);

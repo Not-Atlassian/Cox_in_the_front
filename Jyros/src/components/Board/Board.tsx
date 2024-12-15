@@ -58,7 +58,7 @@ export default function Board() {
   const [viewOpen, setViewOpen] = useState<boolean>(false);
   const [storyTickets, setStoryTickets] = useState<any>([]);
   const context = useContext(AppContext);
-  const { tickets, fetchTickets, updateTicket } = context as any;
+  const { tickets, fetchTickets, updateTicketStatus } = context as any;
   
   useEffect(() => {
     const asyncFunc = async () => {
@@ -130,7 +130,7 @@ export default function Board() {
       movedItem.state = destination.droppableId; // Update the state of the moved task
       const story = storyTickets.find((story: any) => story.storyId === movedItem.intId);
       story.status = Object.keys(status_to_state).find(key => status_to_state[key] === movedItem.state);
-      updateTicket(movedItem.intId, story.status);
+      updateTicketStatus(movedItem.intId, story.status);
       destTasks.splice(destination.index, 0, movedItem);
       setColumns({
         ...columns,

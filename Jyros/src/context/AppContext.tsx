@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, Dispatch, SetStateAction, ReactNode, useCallback } from 'react';
-import { deleteTicket, getTest, getTickets, getTicket, putTicket } from '../lib/api';
+import { deleteTicket, getTest, getTickets, getTicket, putTicketStatus } from '../lib/api';
 
 interface AppContextType {
   data: any;
@@ -7,7 +7,7 @@ interface AppContextType {
   tickets: any[];
   ticket: any;
   fetchTickets: () => Promise<void>;
-  updateTicket: (ticketId: number, status: string) => Promise<void>;
+  updateTicketStatus: (ticketId: number, status: string) => Promise<void>;
   removeTicket: (ticketId: number) => Promise<void>;
   fetchTicket: (ticketId: number) => Promise<void>;
 }
@@ -59,9 +59,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const updateTicket = async (ticketId: number, status: string) => {
+  const updateTicketStatus = async (ticketId: number, status: string) => {
     try {
-      await putTicket(ticketId, status);
+      await putTicketStatus(ticketId, status);
       await fetchTickets();
     } catch (error) {
       console.error('Error updating ticket:', error);
@@ -80,7 +80,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
 
   return (
-    <AppContext.Provider value={{ data, setData, tickets, fetchTickets, updateTicket, removeTicket, fetchTicket, ticket }}>
+    <AppContext.Provider value={{ data, setData, tickets, fetchTickets, updateTicketStatus, removeTicket, fetchTicket, ticket }}>
       {children}
     </AppContext.Provider>
   );
