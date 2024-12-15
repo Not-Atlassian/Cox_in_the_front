@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, Dispatch, SetStateAction, ReactNode, useCallback } from 'react';
-import { deleteTicket, getTest, getTickets, getTicket, putTicketStatus } from '../lib/api';
+import { deleteTicket, getTest, getTickets, getTicket, putTicketStatus, postTicket } from '../lib/api';
 
 interface AppContextType {
   data: any;
@@ -7,6 +7,7 @@ interface AppContextType {
   tickets: any[];
   ticket: any;
   fetchTickets: () => Promise<void>;
+  addTicket: (ticket: any) => Promise<void>;
   updateTicketStatus: (ticketId: number, status: string) => Promise<void>;
   removeTicket: (ticketId: number) => Promise<void>;
   fetchTicket: (ticketId: number) => Promise<void>;
@@ -31,6 +32,15 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
     fetchData();
   }, []);
+
+  const addTicket = async (ticket: any) => {
+    try {
+      await postTicket(ticket);
+      await fetchTickets();
+    } catch (error) {
+      console.error('Error adding ticket:', error);
+    }
+  }
 
   const fetchTickets = useCallback(async () => {
     try {
@@ -62,6 +72,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const updateTicketStatus = async (ticketId: number, status: string) => {
     try {
       await putTicketStatus(ticketId, status);
+      await fetchTicket(ticketId);
       await fetchTickets();
     } catch (error) {
       console.error('Error updating ticket:', error);
@@ -80,7 +91,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
 
   return (
-    <AppContext.Provider value={{ data, setData, tickets, fetchTickets, updateTicketStatus, removeTicket, fetchTicket, ticket }}>
+    <AppContext.Provider value={{ data, setData, tickets, fetchTickets, updateTicketStatus, removeTicket, fetchTicket, ticket, addTicket }}>
       {children}
     </AppContext.Provider>
   );

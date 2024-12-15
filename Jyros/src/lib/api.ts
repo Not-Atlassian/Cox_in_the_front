@@ -16,6 +16,16 @@ export const getTest = async () => {
   }
 };
 
+export const postTicket = async (data: any) => {
+  try {
+    const response = await api.post('/api/Ticket', data); // Replace '/test' with your actual endpoint
+    return response;
+  } catch (error) {
+    console.error('Error posting test data:', error);
+    throw error;
+  }
+}
+
 export const getTickets = async () => {
   try {
     const response = await api.get('/api/Ticket'); // Replace '/api/Ticket' with your actual endpoint

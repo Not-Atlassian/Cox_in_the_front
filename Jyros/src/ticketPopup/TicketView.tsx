@@ -55,12 +55,10 @@ export default function TicketView({id, handleClose}: {id: number, handleClose: 
     } else {
       console.log("Ticket not found");
     }
-  }, []);
+  }, [ticket]);
 
   const handleDeleteTicket = () => {
     console.log("Ticket deleted");
-    // Add the logic for ticket deletion here
-    // For example, you could call an API to delete the ticket or set a state to remove the ticket
     removeTicket(id);
     handleClose();
   }
@@ -71,6 +69,21 @@ export default function TicketView({id, handleClose}: {id: number, handleClose: 
 
   const handlePlanningPoker = () => {
     console.log("Planning Poker clicked")
+  }
+
+  const statusColorClass = (status: string) => {
+    switch (status) {
+      case "To Do":
+        return "bg-yellow-200 text-yellow-800";
+        case "Cooking":
+          return "bg-blue-200 text-blue-800";
+        case "In Plating":
+          return "bg-green-200 text-green-800";
+        case "Bonne appétit":
+          return "bg-red-200 text-red-800";
+        default:
+          return "bg-gray-200 text-gray-800";
+    }
   }
 
   return (
@@ -113,8 +126,8 @@ export default function TicketView({id, handleClose}: {id: number, handleClose: 
               Planning Poker
             </Button>
             <div className="ml-auto">
-              <Badge variant="outline" className="border-green-500 text-green-600 bg-white">
-                To Do
+              <Badge variant="outline" className={statusColorClass(status)}>
+                {status}
               </Badge>
             </div>
           </div>
