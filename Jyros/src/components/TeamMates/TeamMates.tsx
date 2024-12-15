@@ -6,7 +6,7 @@ const TeamMates = ({ teamId }: { teamId: number }) => {
     const [teammates, setTeammates] = useState<string[]>([]);
 
     useEffect(() => {
-        fetch(`http://localhost:7048/Test/GetUsersInTeam/${teamId}`)
+        fetch(`http://localhost:5073/Test/GetUsersInTeam/${teamId}`)
             .then((response) => response.json())
             .then((data: { username: string }[]) => {
                 const usernames = data.map(user => user.username);

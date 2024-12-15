@@ -2,7 +2,7 @@ import axios from 'axios';
 import exp from 'constants';
 
 const api = axios.create({
-  baseURL: 'https://localhost:7048', // Ensure this is the correct base URL for your backend
+  baseURL: 'http://localhost:5047', // Ensure this is the correct base URL for your backend
   withCredentials: true,
 });
 
@@ -97,6 +97,8 @@ export const getUser = async (userId: number) => {
     throw error;
   }
 }
+
+
 
 
 
