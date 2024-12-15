@@ -1,6 +1,6 @@
 'use client'
 
-import { SetStateAction, useState } from "react"
+import { SetStateAction, useContext, useState } from "react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -20,6 +20,8 @@ import CrossingKnives from "./AnimationKnives/CrossingKnives"
 import EstimationPopup from "./EstimationPopup"
 import { DialogTitle } from "@radix-ui/react-dialog"
 import { send } from "process"
+
+import { AppContext } from "@/context/AppContext"
 
 const ForkIcon = () => (
   <svg
@@ -57,6 +59,8 @@ export default function Component() {
   const [status, setStatus] = useState("To Do")
 
   const [openEstimateDialog, setOpenEstimateDialog] = useState(false);
+
+  const { tickets, fetchTickets, addTicket } = useContext(AppContext) as any
   
 
   const handlePriorityChange = (value: string) => setPriority(value)
@@ -119,20 +123,7 @@ export default function Component() {
       status: status,
       storyPoints: storyPlates,
     };
-    fetch(`http://localhost:5047/api/Ticket`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Success:', data);
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-      });
+    addTicket(data);
   }
 
   const handleTicketCreation = () => {
