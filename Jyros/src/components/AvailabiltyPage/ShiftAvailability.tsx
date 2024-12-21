@@ -14,9 +14,11 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 
 import { AppContext } from '@/context/AppContext'
+import { parse } from 'path'
 
 
 interface Developer {
+  id: number
   name: string
   availableDays: number
 }
@@ -28,26 +30,33 @@ interface Adjustment {
 
 export default function ShiftAvailability() {
 
-    const {users, fetchUsers} = useContext(AppContext);
+    const {users, fetchUsers, userAvailability, fetchUserAvailability} = useContext(AppContext) as any;
 
-    const [developers, setDevelopers] = useState<Developer[]>([
-        { name: 'John Doe', availableDays: 5 },
-
-    ])
+    const [developers, setDevelopers] = useState<Developer[]>([])
 
     useEffect(() => {
         fetchUsers();
     }, [fetchUsers]);
 
     useEffect(() => {
-        let devs: Developer[] = [];
-        users.map((user: any) => {
-          devs.push({ name: user.username, availableDays: 5 });
-          console.log(devs);
-        });
+      const fetchAvailability = async () => {
+        const devs: Developer[] = await Promise.all(users.map(async (user: any) => {
+          const availability = await fetchUserAvailability(user.userId as number);
+          console.log("Availability",availability);
+          return {
+            id: user.userId,
+            name: user.username,
+            availableDays: availability ? availability : 0,
+          };
+        }));
+        console.log("Developers",developers);
         setDevelopers(devs);
-      }, [users]);
-
+      };
+  
+      if (users.length > 0) {
+        fetchAvailability();
+      }
+    }, [users, fetchUserAvailability]);
   
   const [adjustments, setAdjustments] = useState<Adjustment[]>([
     { days: 1, reason: 'Team Planning Meeting' }
@@ -99,7 +108,7 @@ export default function ShiftAvailability() {
             <svg width="20" height="20" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect x="1" y="1" width="14" height="14" rx="2" stroke="currentColor" strokeWidth="2"/>
             </svg>
-            <span>{totalDays} Available Days</span>
+            <span>{totalDays} Availablilty Points</span>
           </div>
           <span>•</span>
           <div className="flex items-center gap-2">
@@ -133,10 +142,10 @@ export default function ShiftAvailability() {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-base text-muted-foreground">Available Days</label>
+              <label className="text-base text-muted-foreground">Availabilty Points</label>
               <Input
                 type="number"
-                value={developer.availableDays}
+                value={developer.availableDays !== undefined ? developer.availableDays : 0}
                 onChange={(e) => {
                   const newDevelopers = [...developers]
                   newDevelopers[index].availableDays = parseInt(e.target.value)

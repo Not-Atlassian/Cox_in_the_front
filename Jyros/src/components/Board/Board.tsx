@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useContext } from 'react'
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd'
-import { MoreVertical, Utensils } from 'lucide-react'
+import { MoreVertical, Utensils, UtensilsCrossed } from 'lucide-react'
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -17,10 +17,29 @@ import TicketView from '@/ticketPopup/TicketView'
 
 import { AppContext } from '@/context/AppContext'
 
+const ForkIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="25"
+    height="25"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
+    <path d="M7 2v20" />
+  </svg>
+)
+
+
 interface Task {
   id: string
   content: string
   state: string,
+  priority?: number,
   intId: number
 }
 
@@ -35,7 +54,7 @@ interface ColumnState {
 }
 
 const Tasks = [
-  { id: 'task-1', content: 'Task 1: Bla bla bla bla bla bla', state: '1', intId: 9 },
+  { id: 'task-1', content: 'Task 1: Bla bla bla bla bla bla', state: '1',priority: 1 ,intId: 9 },
 ]
 
 const initcolumns: ColumnState = {
@@ -51,6 +70,19 @@ const status_to_state: {[key: string]: string}  = {
   "In Plating": "3",
   "Bonne appétit": "4"
 }
+
+const getPriorityIcon = (priority: number) => {
+  switch (priority) {
+    case 3:
+      return <UtensilsCrossed className="h-4 w-4" />;
+    case 2:
+      return <Utensils className="h-4 w-4" />;
+    case 1:
+      return <ForkIcon />;
+    default:
+      return null;
+  }
+};
 
 export default function Board() {
   const [columns, setColumns] = useState<ColumnState>(initcolumns);
@@ -89,6 +121,7 @@ export default function Board() {
           id: `task-${story.storyId}`,
           content: story.title,
           state: status_to_state[story.status as string],
+          priority: story.priority,
           intId: story.storyId,
         });
       });
@@ -197,7 +230,7 @@ export default function Board() {
                                       <span className="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Parent</span>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                      <Utensils className="h-4 w-4" />
+                                      {getPriorityIcon(task.priority as number)}
                                       <Avatar className="h-6 w-6">
                                         <AvatarFallback>U</AvatarFallback>
                                       </Avatar>

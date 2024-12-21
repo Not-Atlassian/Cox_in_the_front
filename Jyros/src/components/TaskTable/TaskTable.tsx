@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { ArrowUpDown, ChevronDown, ChevronUp } from 'lucide-react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Utensils, UtensilsCrossed } from 'lucide-react'
@@ -14,10 +14,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import SearchBar from '@/components/SearchBar/SearchBar'
-
 import './TaskTable.css'
 import { Badge } from '../ui/badge'
 import UserCard from '../Shared/UserCard/UserCard'
+
+import { AppContext } from '@/context/AppContext'
+import { randomInt } from 'crypto'
 
 const ForkIcon = () => (
   <svg
@@ -36,15 +38,19 @@ const ForkIcon = () => (
   </svg>
 )
 
-const tasks = [
-  { task: 'Task 1', title: 'Title 1', priority: 1, status: 'Done' },
-  { task: 'Task 2', title: 'Title 2', priority: 2, status: 'To Do' },
-  { task: 'Task 3', title: 'Title 3', priority: 3, status: 'Cooking' },
-  { task: 'Task 4', title: 'Title 4', priority: 1, status: 'Done' },
-  { task: 'Task 5', title: 'Title 5', priority: 2, status: 'Bon appétit' },
-  { task: 'Task 6', title: 'Title 6', priority: 3, status: 'In Plating' },
-  { task: 'Task 7', title: 'Title 7', priority: 1, status: 'Done' },
-]
+
+
+//  const tasks = [
+//   { task: 'Task 1', title: 'Title 1', priority: 1, status: 'Done' },
+//   { task: 'Task 2', title: 'Title 2', priority: 2, status: 'To Do' },
+//   { task: 'Task 3', title: 'Title 3', priority: 3, status: 'Cooking' },
+//   { task: 'Task 4', title: 'Title 4', priority: 1, status: 'Done' },
+//   { task: 'Task 5', title: 'Title 5', priority: 2, status: 'Bon appétit' },
+//   { task: 'Task 6', title: 'Title 6', priority: 3, status: 'In Plating' },
+//   { task: 'Task 7', title: 'Title 7', priority: 1, status: 'Done' },
+// ]
+
+let tasks: any[] = []
 
 const filterList = ['Epic', 'Done', 'In Plating', 'Cooking', 'To Do']
 
@@ -54,6 +60,37 @@ export default function FilterableTaskTable() {
   const [sortConfig, setSortConfig] = useState<{ key: keyof typeof tasks[0]; direction: 'asc' | 'desc' } | null>(null)
   const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set()) // Track selected tasks
   const [searchQuery, setSearchQuery] = useState('') // State for search query
+
+  const {tickets,fetchTickets} = useContext(AppContext) as any;
+
+ useEffect(() => {
+    const asyncFunc = async () => {
+      await fetchTickets();
+    };
+    asyncFunc();
+  }, [fetchTickets]);
+
+useEffect(() => {
+  const asyncFunc = async () => {
+    if (!tickets || tickets.length === 0) {
+      console.error('No tickets available');
+      return;
+    }
+
+    console.log("tickets", tickets);
+
+    const newTasks = tickets.map((ticket: any) => ({
+      task: ticket.storyId.toString(),
+      title: ticket.title,
+      priority: ticket.priority,
+      status: ticket.status,
+    }));
+
+    tasks = newTasks;
+  }
+  asyncFunc();
+}, [tickets])
+
 
   const handleFilterChange = (filter: string, isChecked: boolean) => {
     setSelectedFilters((prev) => ({ ...prev, [filter]: isChecked }))
