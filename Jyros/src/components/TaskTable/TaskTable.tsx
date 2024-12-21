@@ -1,12 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { ArrowUpDown, ChevronDown, ChevronUp } from 'lucide-react'
+import { ArrowUpDown, BaggageClaim, ChevronDown, ChevronDownCircle, ChevronUp, Icon, PlusCircleIcon } from 'lucide-react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Utensils, UtensilsCrossed } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
-import { ChevronDownCircle } from "@mynaui/icons-react";
+
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -16,8 +16,8 @@ import {
 import SearchBar from '@/components/SearchBar/SearchBar'
 
 import './TaskTable.css'
-import { Item } from '@radix-ui/react-dropdown-menu'
 import { Badge } from '../ui/badge'
+
 
 const ForkIcon = () => (
   <svg
@@ -36,35 +36,69 @@ const ForkIcon = () => (
   </svg>
 )
 
-const tasks = [
-  { task: 'Task 1', title: 'Title 1', priority: 1, status: 'Done' },
-  { task: 'Task 2', title: 'Title 2', priority: 2, status: 'To Do' },
-  { task: 'Task 3', title: 'Title 3', priority: 3, status: 'Cooking' },
-  { task: 'Task 4', title: 'Title 4', priority: 1, status: 'Done' },
-  { task: 'Task 5', title: 'Title 5', priority: 2, status: 'Bon appétit' },
-  { task: 'Task 6', title: 'Title 6', priority: 3, status: 'In Plating' },
-  { task: 'Task 7', title: 'Title 7', priority: 1, status: 'Done' },
+const tasksData = [
+  { task: 'Task 1', title: 'Title 1', priority: 1, status: 'Cooking' , shift: 'Shift 1'},
+  { task: 'Task 2', title: 'Title 2', priority: 2, status: 'To Do', shift: 'Shift 2' },
+  { task: 'Task 3', title: 'Title 3', priority: 3, status: 'Cooking', shift: 'Shift 1' },
+  { task: 'Task 4', title: 'Title 4', priority: 1, status: 'Bon appétit', shift: 'Shift 2' },
+  { task: 'Task 5', title: 'Title 5', priority: 2, status: 'Bon appétit', shift: 'Shift 1' },
+  { task: 'Task 6', title: 'Title 6', priority: 3, status: 'In Plating', shift: 'Shift 2' },
+  { task: 'Task 7', title: 'Title 7', priority: 1, status: 'In Plating', shift: 'Shift 1' },
 ]
 
-const filterList = ['Epic', 'Done', 'In Plating', 'Cooking', 'To Do']
+const shiftsData = [
+  { task: 'Shift 1', title: 'Title 1', startDate: '2022-10-01', endDate: '2022-10-03', description: 'Description 1' },
+  { task: 'Shift 2', title: 'Title 2', startDate: '2022-10-04', endDate: '2022-10-06', description: 'Description 2' },
+]
 
-export default function FilterableTaskTable() {
+const filterList = ['Bon appétit', 'In Plating', 'Cooking', 'To Do']
+
+
+
+const FilterableTaskTable = () => {
+  const [tasks, setTasks] = useState(tasksData);
+  const [shifts, setShifts] = useState(shiftsData);
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilters, setSelectedFilters] = useState<{ [key: string]: boolean }>({})
+  // const [selectedFilters, setSelectedFilters] = useState({});
+  const [selectedTasks, setSelectedTasks] = useState(new Set());
+  // const [sortConfig, setSortConfig] = useState(null);
   const [isOpen, setIsOpen] = useState(false)
   const [sortConfig, setSortConfig] = useState<{ key: keyof typeof tasks[0]; direction: 'asc' | 'desc' } | null>(null)
-  const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set()) // Track selected tasks
-  const [searchQuery, setSearchQuery] = useState('') // State for search query
+  // const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set()) // Track selected tasks
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
 
   const handleFilterChange = (filter: string, isChecked: boolean) => {
     setSelectedFilters((prev) => ({ ...prev, [filter]: isChecked }))
   }
 
+  const handleCreateShift = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const target = event.target as typeof event.target & {
+      title: { value: string };
+      startDate: { value: string };
+      endDate: { value: string };
+      description: { value: string };
+    };
+    event.preventDefault();
+    const newShift = {
+      task: `Shift ${shifts.length + 1}`,
+      title: target.title.value,
+      startDate: target.startDate.value,
+      endDate: target.endDate.value,
+      description: target.description.value,
+    };
+    setShifts((prev) => [...prev, newShift]);
+    setIsModalOpen(false);
+  };
+
+  
   const statusOrder: { [key: string]: number } = {
     "To Do": 1,
     "Cooking": 2,
     "In Plating": 3,
-    "Done": 4,
-    "Bon appétit": 5,
+    "Bon appétit": 4,
   }
 
   const handleSort = (key: keyof typeof tasks[0]) => {
@@ -127,12 +161,34 @@ export default function FilterableTaskTable() {
       return updated
     })
   }
+  const groupedTasks = shifts.map((shift) => {
+    const tasksForShift = sortedTasks.filter((task) => task.shift === shift.task);
+  
+    // Count tasks based on their status
+    const statusCounts = tasksForShift.reduce(
+      (counts, task) => {
+        if (task.status === 'To do') counts.toDo++;
+        if (task.status === 'Cooking') counts.cooking++;
+        if (task.status === 'In plating') counts.inPlating++;
+        if (task.status === 'Bon appétit') counts.bonAppetit++;
+        return counts;
+      },
+      { toDo: 0, cooking: 0, inPlating: 0, bonAppetit: 0 }
+    );
+  
+    return {
+      shiftName: shift.title,
+      velocity: 1,
+      tasks: tasksForShift,
+      statusCounts, // Add the status counts here
+    };
+  });
+  
+
 
   // Function to get the appropriate class based on status
   const getStatusClass = (status: string) => {
     switch (status) {
-      case 'Done':
-        return 'status-bubble status-done';
       case 'To Do':
         return 'status-bubble status-to-do';
       case 'Cooking':
@@ -144,6 +200,25 @@ export default function FilterableTaskTable() {
       default:
         return 'status-bubble status-default';
     }
+  }
+
+  const handleCreateTask = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const target = event.target as typeof event.target & {
+      title: { value: string };
+      shift: { value: string };
+      priority: { value: string };
+      status: { value: string };
+    };
+    const newTask = {
+      task: `Task ${tasks.length + 1}`,
+      title: target.title.value,
+      shift: target.shift.value,
+      priority: parseInt(target.priority.value),
+      status: target.status.value,
+    };
+    setTasks((prev) => [...prev, newTask]);
+    setIsTaskModalOpen(false);
   }
 
   return (
@@ -171,66 +246,248 @@ export default function FilterableTaskTable() {
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
+        <Button 
+          className='bg-white-500 hover:bg-gray-300 text-gray ml-10' 
+          onClick={() => setIsTaskModalOpen(true)}
+        >
+          <PlusCircleIcon size={18}/>
+          Add Task
+        </Button>
+        {isTaskModalOpen && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <h2 className="text-xl font-bold mb-4">Create New Task</h2>
+              <form onSubmit={handleCreateTask} className="space-y-4">
+                <div className="form-group">
+                  <label htmlFor="title" className="block font-medium mb-1">Task Title</label>
+                  <input 
+                    id="title" 
+                    name="title" 
+                    className="input-field w-full p-2 border border-gray-300 rounded-md" 
+                    placeholder="Enter task name" 
+                    required 
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="shift" className="block font-medium mb-1">Shift Name</label>
+                  <select 
+                    id="shiftName" 
+                    name="shift" 
+                    className="input-field w-full p-2 border border-gray-300 rounded-md" 
+                    required
+                  >
+                    <option value="" disabled selected>Select a shift</option>
+                    {shifts.map((shift, index) => (
+                      <option key={index} value={shift.task}>
+                        {shift.task}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label htmlFor="priority" className="block font-medium mb-1">Priority</label>
+                  <select 
+                    id="priority" 
+                    name="priority" 
+                    className="input-field w-full p-2 border border-gray-300 rounded-md" 
+                    required
+                  >
+                    <option value="" disabled selected>Select priority</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label htmlFor="status" className="block font-medium mb-1">Status</label>
+                  <select 
+                    id="status" 
+                    name="status" 
+                    className="input-field w-full p-2 border border-gray-300 rounded-md" 
+                    required
+                  >
+                    <option value="" disabled selected>Select priority</option>
+                    <option value="To Do">To Do</option>
+                    <option value="Cooking">Cooking</option>
+                    <option value="In Plating">In Plating</option>
+                    <option value="Bon appétit">Bon appétit</option>
+                    
+                  </select>
+                </div>
+                <div className="form-actions flex items-center justify-end space-x-4">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => setIsTaskModalOpen(false)} 
+                    className="bg-gray-200 hover:bg-gray-300 text-gray-800"
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white">
+                    Create
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
 
         </div>
-        
-
       </div>
       
 
-      <Table className="task-table">
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[100px]">
-              <Checkbox
-                checked={sortedTasks.length > 0 && sortedTasks.every((task) => selectedTasks.has(task.task))}
-                onCheckedChange={handleSelectAll}
-                className="custom-checkbox"
-              />
-              Task
-            </TableHead>
-            <TableHead onClick={() => handleSort('title')} className="cursor-pointer">
-              Title <ArrowUpDown className="inline h-4 w-4" />
-            </TableHead>
-            <TableHead onClick={() => handleSort('priority')} className="cursor-pointer">
-              Priority <ArrowUpDown className="inline h-4 w-4" />
-            </TableHead>
-            <TableHead onClick={() => handleSort('status')} className="cursor-pointer text-right">
-              Status <ArrowUpDown className="inline h-4 w-4" />
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {sortedTasks.map((task) => (
-            <TableRow key={task.task}>
-              <TableCell className="font-medium">
-                <Checkbox
-                  checked={selectedTasks.has(task.task)}
-                  onCheckedChange={(isChecked) => handleTaskSelect(task.task, isChecked as boolean)}
-                  className="mr-2 custom-checkbox"
-                />
-                {task.task}
-              </TableCell>
-              <TableCell>{task.title}</TableCell>
-              <TableCell>
-                {task.priority == 1 ? <ForkIcon/> : task.priority == 2 ? <Utensils/> : <UtensilsCrossed/>}
-              </TableCell>
-              <TableCell className='status-cell'>
 
-              <Badge variant="outline" className="bg-green-300 mr-4 w-200">
-                Parent
-              </Badge>
-              <div className={`${getStatusClass(task.status)} status-div`}>
-                  {task.status} 
-                  <ChevronDownCircle />
-                 
-                </div>
-                <img className="user-logo" src="src/assets/user_logo.png"></img>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      {groupedTasks.map((group) => (
+        <div key={group.shiftName} className="task-group">
+          <div className="flex items-center justify-between gap-4 p-2 border border-gray-300 rounded-md bg-white shadow-sm">
+          <div className="flex items-center gap-4">
+            <span className="text-s font-bold text-gray-400">{group.shiftName}</span>
+            <span className="text-s font-bold text-gray-400">Velocity: {group.velocity}</span>
+          </div>
+          <div className="flex items-center gap-4 ml-auto">
+            <span className="text-xs font-bold text-gray-400">To do:  
+              <Badge variant="outline" className="status-to-do mr-2">
+                {group.statusCounts.toDo}
+              </Badge></span>
+            <span className="text-xs font-bold text-gray-400">Cooking:
+              <Badge variant="outline" className="status-cooking mr-2">
+                {group.statusCounts.cooking}
+              </Badge></span>
+            <span className="text-xs font-bold text-gray-400">In plating: 
+              <Badge variant="outline" className="status-in-plating mr-2">
+                {group.statusCounts.inPlating}
+              </Badge></span>
+            <span className="text-xs font-bold text-gray-400">Bon appétit: 
+              <Badge variant="outline" className="status-bon-appetit mr-2">
+                {group.statusCounts.bonAppetit}
+              </Badge></span>
+          </div>
+        </div>
+          <Table className="task-table">
+            <TableHeader>
+              <TableRow className="bg-gray-100">
+                  <TableHead className="w-[100px]">
+                  <Checkbox
+                    checked={sortedTasks.length > 0 && sortedTasks.every((task) => selectedTasks.has(task.task))}
+                    onCheckedChange={handleSelectAll}
+                    className="custom-checkbox"
+                  />
+                  Task
+                </TableHead>
+                <TableHead onClick={() => handleSort('title')} className="cursor-pointer w-[150px]">
+                  Title <ArrowUpDown className='inline h-4 w-4'/>
+                </TableHead>
+                <TableHead onClick={() => handleSort('priority')} className="cursor-pointer w-[100px]">
+                  Priority <ArrowUpDown className='inline h-4 w-4'/>
+                </TableHead>
+                <TableHead onClick={() => handleSort('status')} className="cursor-pointer w-[200px] text-center">
+                  Status <ArrowUpDown className='inline h-4 w-4'/>
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {group.tasks.map((task) => (
+                <TableRow key={task.task}>
+                  <TableCell className="font-medium truncate max-w-[100px] text-gray-500" >
+                    <Checkbox
+                      checked={selectedTasks.has(task.task)}
+                      onCheckedChange={(isChecked) => handleTaskSelect(task.task, isChecked as boolean)}
+                      className="mr-2 custom-checkbox"
+                    />
+                    {task.task}
+                  </TableCell>
+                  <TableCell className='truncate max-w-[150px] font-bold'>{task.title} </TableCell>
+                  <TableCell className='truncate max-w-[100px]'>
+                    {task.priority === 1 ? <ForkIcon /> : task.priority === 2 ? <Utensils /> : <UtensilsCrossed />}
+                  </TableCell>
+                  <TableCell className='status-cell'>
+                    <Badge variant="outline" className="bg-green-300 mr-4 w-[100px]">
+                      Parent
+                    </Badge>
+                    <div className={`${getStatusClass(task.status)} status-div`}>
+                        {task.status} 
+                        <ChevronDownCircle />
+                    </div>
+                    <img className="user-logo" src="src/assets/user_logo.png"></img>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      ))}
+
+    <div>
+      {/* Modal for Shift Creation */}
+      <Button onClick={() => setIsModalOpen(true)} className="bg-white-500 hover:bg-gray-300 text-gray">
+        <PlusCircleIcon size={18} /> Create Shift
+      </Button>
+      {isModalOpen && (
+      <div className="modal-overlay">
+        <div className="modal-content">
+          <h2 className="text-xl font-bold mb-4">Create New Shift</h2>
+          <form onSubmit={handleCreateShift} className="space-y-4">
+            <div className="form-group">
+              <label htmlFor="title" className="block font-medium mb-1">Shift Name</label>
+              <input 
+                id="title" 
+                name="title" 
+                className="input-field w-full p-2 border border-gray-300 rounded-md" 
+                placeholder="Enter shift name" 
+                required 
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="startDate" className="block font-medium mb-1">Start Date</label>
+              <input 
+                id="startDate" 
+                name="startDate" 
+                type="date" 
+                className="input-field w-full p-2 border border-gray-300 rounded-md" 
+                required 
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="endDate" className="block font-medium mb-1">End Date</label>
+              <input 
+                id="endDate" 
+                name="endDate" 
+                type="date" 
+                className="input-field w-full p-2 border border-gray-300 rounded-md" 
+                required 
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="description" className="block font-medium mb-1">Description</label>
+              <textarea 
+                id="description" 
+                name="description" 
+                className="input-field w-full p-2 border border-gray-300 rounded-md" 
+                // rows="4" 
+                placeholder="Enter shift description" 
+                required 
+              ></textarea>
+            </div>
+            <div className="form-actions flex items-center justify-end space-x-4">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setIsModalOpen(false)} 
+                className="bg-gray-200 hover:bg-gray-300 text-gray-800"
+              >
+                Cancel
+              </Button>
+              <Button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white">
+                Create
+              </Button>
+            </div>
+          </form>
+        </div>
+      </div>
+    )}
+    </div>
     </div>
   )
 }
+
+export default FilterableTaskTable
