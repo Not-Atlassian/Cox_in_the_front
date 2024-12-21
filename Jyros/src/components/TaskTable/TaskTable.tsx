@@ -17,6 +17,7 @@ import SearchBar from '@/components/SearchBar/SearchBar'
 
 import './TaskTable.css'
 import { Badge } from '../ui/badge'
+import UserCard from '../Shared/UserCard/UserCard'
 
 
 const ForkIcon = () => (

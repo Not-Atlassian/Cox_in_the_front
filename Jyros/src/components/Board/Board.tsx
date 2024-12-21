@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd'
-import { Archive, ChevronLeft, ClipboardList, MoreVertical, Plus, Users, Utensils } from 'lucide-react'
+import { MoreVertical, Utensils } from 'lucide-react'
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -13,11 +13,15 @@ import {
 import TicketCreate from '../../ticketPopup/TicketCreate'
 import TeamMates from '@/components/TeamMates/TeamMates'
 import SideBar from '@/components/Shared/SideBar/SideBar'
+import TicketView from '@/ticketPopup/TicketView'
+
+import { AppContext } from '@/context/AppContext'
 
 interface Task {
   id: string
   content: string
-  state: string
+  state: string,
+  intId: number
 }
 
 interface Column {
@@ -31,18 +35,7 @@ interface ColumnState {
 }
 
 const Tasks = [
-  { id: 'task-1', content: 'Task 1: Bla bla bla bla bla bla', state: '1' },
-  { id: 'task-2', content: 'Task 2: Bla bla bla bla bla bla', state: '1' },
-  { id: 'task-3', content: 'Task 3: Bla bla bla bla bla bla', state: '1' },
-  { id: 'task-4', content: 'Task 4: Bla bla bla bla bla bla', state: '2' },
-  { id: 'task-5', content: 'Task 5: Bla bla bla bla bla bla', state: '2' },
-  { id: 'task-6', content: 'Task 6: Bla bla bla bla bla bla', state: '2' },
-  { id: 'task-7', content: 'Task 7: Bla bla bla bla bla bla', state: '3' },
-  { id: 'task-8', content: 'Task 8: Bla bla bla bla bla bla', state: '3' },
-  { id: 'task-9', content: 'Task 9: Bla bla bla bla bla bla', state: '3' },
-  { id: 'task-10', content: 'Task 10: Bla bla bla bla bla bla', state: '4' },
-  { id: 'task-11', content: 'Task 11: Bla bla bla bla bla bla', state: '4' },
-  { id: 'task-12', content: 'Task 12: Bla bla bla bla bla bla', state: '4' },
+  { id: 'task-1', content: 'Task 1: Bla bla bla bla bla bla', state: '1', intId: 9 },
 ]
 
 const initcolumns: ColumnState = {
@@ -52,16 +45,66 @@ const initcolumns: ColumnState = {
   '4': { id: '4', title: 'Bonne appetit :3', tasks: [] },
 }
 
+const status_to_state: {[key: string]: string}  = {
+  "To Do": "1",
+  "Cooking": "2",
+  "In Plating": "3",
+  "Bonne appétit": "4"
+}
+
 export default function Board() {
   const [columns, setColumns] = useState<ColumnState>(initcolumns);
+  const [taskId, setTaskId] = useState<number>(0);
+  const [viewOpen, setViewOpen] = useState<boolean>(false);
+  const [storyTickets, setStoryTickets] = useState<any>([]);
+  const context = useContext(AppContext);
+  const { tickets, fetchTickets, updateTicketStatus } = context as any;
+  
+  useEffect(() => {
+    const asyncFunc = async () => {
+      await fetchTickets();
+    };
+    asyncFunc();
+  }, [fetchTickets]);
+
 
   useEffect(() => {
-    const columnsCopy = { ...initcolumns };
-    Tasks.forEach((task) => {
-      columnsCopy[task.state].tasks.push(task);
-    });
-    setColumns(columnsCopy);
-  }, []);
+    const asyncFunc = async () => {
+      if (!tickets || tickets.length === 0) {
+        console.error('No tickets available');
+        return;
+      }
+      
+      const stories = JSON.parse(JSON.stringify(tickets));
+      console.log(stories);
+      if (!stories) {
+        console.error('Failed to parse stories');
+        return;
+      }
+  
+      setStoryTickets(stories);
+      Tasks.splice(0, Tasks.length);
+      stories.forEach((story: any) => {
+        Tasks.push({
+          id: `task-${story.storyId}`,
+          content: story.title,
+          state: status_to_state[story.status as string],
+          intId: story.storyId,
+        });
+      });
+  
+      const columnsCopy = { ...initcolumns };
+      Object.values(columnsCopy).forEach((column) => {
+        column.tasks = [];
+      });
+      Tasks.forEach((task) => {
+        columnsCopy[task.state].tasks.push(task);
+      });
+      setColumns(columnsCopy);
+    };
+  
+    asyncFunc();
+  }, [tickets]);
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination } = result;
@@ -85,7 +128,9 @@ export default function Board() {
     } else {
       const [movedItem] = sourceTasks.splice(source.index, 1);
       movedItem.state = destination.droppableId; // Update the state of the moved task
-  
+      const story = storyTickets.find((story: any) => story.storyId === movedItem.intId);
+      story.status = Object.keys(status_to_state).find(key => status_to_state[key] === movedItem.state);
+      updateTicketStatus(movedItem.intId, story.status);
       destTasks.splice(destination.index, 0, movedItem);
       setColumns({
         ...columns,
@@ -109,9 +154,6 @@ export default function Board() {
         <SidebarInset className="flex-1 overflow-auto">
           <header className="flex items-center justify-between border-b p-4">
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon">
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
               <h1 className="text-xl font-semibold">Team Name/ Project Name/ Board</h1>
             </div>
             <Button variant="ghost" size="icon">
@@ -122,6 +164,9 @@ export default function Board() {
             <div className="mb-6 flex items-center justify-between">
               <TeamMates teamId={1}/>
               <TicketCreate />
+              {
+                viewOpen ? (<TicketView id={taskId} handleClose={() => setViewOpen(false)}  />) : ""
+              }
             </div>
             <DragDropContext onDragEnd={onDragEnd}>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -137,6 +182,10 @@ export default function Board() {
                             <Draggable key={task.id} draggableId={task.id} index={index}>
                               {(provided) => (
                                 <Card
+                                  onClick={() =>{ 
+                                    setTaskId(task.intId);
+                                    setViewOpen(true)
+                                  }}
                                   ref={provided.innerRef}
                                   {...provided.draggableProps}
                                   {...provided.dragHandleProps}
@@ -171,4 +220,5 @@ export default function Board() {
       </div>
     </SidebarProvider>
   );
+
 }
