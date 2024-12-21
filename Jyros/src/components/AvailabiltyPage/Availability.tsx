@@ -1,11 +1,11 @@
-import TaskTable from "@/components/TaskTable/TaskTable"
 import SideBar from "@/components/Shared/SideBar/SideBar"
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 import { MoreVertical } from "lucide-react"
+import ShiftAvailability from "./ShiftAvailability"
 
 
-const BacklogPage = () => {
+const Availability = () => {
 
   return (
     <>
@@ -22,7 +22,7 @@ const BacklogPage = () => {
               </Button>
             </header>
             <div style={{ "marginLeft": "5rem" }}>
-              <TaskTable />
+              <ShiftAvailability/>
             </div>
           </SidebarInset>
         </SidebarProvider>
@@ -32,4 +32,4 @@ const BacklogPage = () => {
 }
 
 
-export default BacklogPage
+export default Availability

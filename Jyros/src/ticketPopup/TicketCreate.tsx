@@ -1,6 +1,6 @@
 'use client'
 
-import { SetStateAction, useState } from "react"
+import { SetStateAction, useContext, useState } from "react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -19,6 +19,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import CrossingKnives from "./AnimationKnives/CrossingKnives"
 import EstimationPopup from "./EstimationPopup"
 import { DialogTitle } from "@radix-ui/react-dialog"
+import { send } from "process"
+
+import { AppContext } from "@/context/AppContext"
 
 const ForkIcon = () => (
   <svg
@@ -46,14 +49,18 @@ export default function Component() {
   const [showAnimation, setShowAnimation] = useState(false)
   const [assignee, setAssignee] = useState("Unassigned")
   const [reporter, setReporter] = useState("Unassigned")
+  const [reporterId, setReporterId] = useState(0)
   const [team, setTeam] = useState("Unassigned")
   const [shift, setShift] = useState("(To be implemented)")
   const [storyPlates, setStoryPlates] = useState(0)
   const [parent, setParent] = useState("None")
+  const [parentId, setParentId] = useState(0)
   const [priority, setPriority] = useState("Select priority")
   const [status, setStatus] = useState("To Do")
 
   const [openEstimateDialog, setOpenEstimateDialog] = useState(false);
+
+  const { tickets, fetchTickets, addTicket } = useContext(AppContext) as any
   
 
   const handlePriorityChange = (value: string) => setPriority(value)
@@ -106,7 +113,21 @@ export default function Component() {
     setParent(e.target.value)
   }
 
+  const sendTicketCreationRequest = () => {
+    const data = {
+      title: title,
+      description: description,
+      parentId: parentId,
+      sprintId: parentId,
+      createdBy: reporterId,
+      status: status,
+      storyPoints: storyPlates,
+    };
+    addTicket(data);
+  }
+
   const handleTicketCreation = () => {
+    sendTicketCreationRequest()
     setShowAnimation(true)
     setTimeout(() => {
       setShowAnimation(false)
@@ -131,7 +152,7 @@ export default function Component() {
               <Plus className="mr-2 h-4 w-4" /> Create Ticket
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-4xl p-0">
+          <DialogContent className="max-w-4xl p-0 [&>button]:hidden">
             <DialogHeader className="p-4 bg-[#F8F9FA] border-b">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -196,7 +217,7 @@ export default function Component() {
                       onChange={handleInputChange(setDescription)}
                     />
                   </div>
-                  <div>
+                  {/* <div>
                     <Label htmlFor="comments" className="text-base font-semibold">Comments</Label>
                     <Label htmlFor="comments" className="block text-sm text-gray-500 mt-1">Your message</Label>
                     <Textarea
@@ -206,7 +227,7 @@ export default function Component() {
                       value={comments}
                       onChange={handleInputChange(setComments)}
                     />
-                  </div>
+                  </div> */}
                 </div>
                 <div className="bg-[#F8F9FA] rounded-lg p-4">
                   <h3 className="font-semibold mb-4">Details</h3>

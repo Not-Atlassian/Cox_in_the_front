@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -7,13 +7,17 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { ChevronLeft, ChevronUp, Zap, Trash } from "lucide-react"
 
-export default function TicketView() {
+import { AppContext } from "@/context/AppContext"
+import { Context } from "vm"
+
+export default function TicketView({ id, handleClose }: { id: number, handleClose: () => void }) {
   const [ticketTitle, setTicketTitle] = useState("BLA BLA BLA BLA BLA BLA bla bla bla bal bal abl")
   const [ticketDescription, setTicketDescription] = useState("This is an example of a ticket description. This is an example of a ticket description. This is an example of a ticket description.")
   const [comment, setComment] = useState("")
@@ -24,18 +28,161 @@ export default function TicketView() {
   const [storyPlates, setStoryPlates] = useState(5)
   const [parent, setParent] = useState("blzbalbal bnlab")
   const [priority, setPriority] = useState("Select priority")
+  const [status, setStatus] = useState("To Do")
 
   const [teamName, setTeamName] = useState("Team A")
   const [projectName, setProjectName] = useState("Project X")
   const [featureName, setFeatureName] = useState("Feature Y")
   const [epicName, setEpicName] = useState("Epic Z")
   const [ticketName, setTicketName] = useState("Ticket #123")
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeleteDialogOpen2, setIsDeleteDialogOpen2] = useState(false);
+  const [isDeleteDialogOpen3, setIsDeleteDialogOpen3] = useState(false);
+
+  const context = useContext(AppContext);
+  const { removeTicket, fetchTicket, ticket } = context as Context;
+
+  const [dialogPosition2, setDialogPosition2] = useState({ top: 0, left: 0 });
+  const [dialogPosition3, setDialogPosition3] = useState({ top: 0, left: 0 });
+
+  useEffect(() => {
+    setDialogPosition2(generateRandomPosition());
+    setDialogPosition3(generateRandomPosition());
+  }, []);
+
+  const generateRandomPosition = () => {
+    const top = Math.floor(Math.random() * (window.innerHeight - 200));
+    const left = Math.floor(Math.random() * (window.innerWidth - 300));
+    return { top, left };
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!ticket || ticket.id !== id)
+        await fetchTicket(id);
+    };
+    fetchData();
+  }, [id, fetchTicket])
+
+  useEffect(() => {
+    if (ticket) {
+      setTicketTitle(ticket.title);
+      setTicketDescription(ticket.description);
+      setStoryPlates(ticket.storyPoints);
+      setStatus(ticket.status);
+    } else {
+      console.log("Ticket not found");
+    }
+  }, [ticket]);
 
   const handleDeleteTicket = () => {
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    // Perform the delete action here
+
+    setIsDeleteDialogOpen(false);
+    handleDeleteTicket2();
+  };
+
+  const cancelDelete = () => {
+    setIsDeleteDialogOpen(false);
+  };
+
+  const handleDeleteTicket2 = () => {
+    setIsDeleteDialogOpen2(true);
+  };
+
+  const confirmDelete2 = () => {
+    // Perform the delete action here
+
+    setIsDeleteDialogOpen2(false);
+    handleDeleteTicket3();
+
+  };
+
+  const cancelDelete2 = () => {
+    setIsDeleteDialogOpen2(false);
+  };
+
+  const handleDeleteTicket3 = () => {
+    setIsDeleteDialogOpen3(true);
+  };
+
+  const confirmDelete3 = () => {
+    // Perform the delete action here
     console.log("Ticket deleted");
-    // Add the logic for ticket deletion here
-    // For example, you could call an API to delete the ticket or set a state to remove the ticket
-  }
+    removeTicket(id);
+    setIsDeleteDialogOpen3(false);
+    handleClose();
+  };
+
+  const cancelDelete3 = () => {
+    setIsDeleteDialogOpen3(false);
+  };
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   const handleEstimateAI = () => {
     console.log("Estimate with AI clicked")
@@ -45,12 +192,27 @@ export default function TicketView() {
     console.log("Planning Poker clicked")
   }
 
+  const statusColorClass = (status: string) => {
+    switch (status) {
+      case "To Do":
+        return "bg-yellow-200 text-yellow-800";
+      case "Cooking":
+        return "bg-blue-200 text-blue-800";
+      case "In Plating":
+        return "bg-green-200 text-green-800";
+      case "Bonne appétit":
+        return "bg-red-200 text-red-800";
+      default:
+        return "bg-gray-200 text-gray-800";
+    }
+  }
+
   return (
-    <Dialog defaultOpen>
-      <DialogContent className="max-w-4xl p-0">
+    <Dialog defaultOpen onOpenChange={(open) => { if (!open) handleClose() }}>
+      <DialogContent className="max-w-4xl p-0 [&>button]:hidden">
         <DialogHeader className="p-4 bg-[#F8F9FA]">
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Button variant="ghost" size="icon" className="h-8 w-8 bg-[#212529] text-white rounded-md hover:bg-[#343A40]">
+            <Button variant="ghost" size="icon" className="h-8 w-8 bg-[#212529] text-white rounded-md hover:bg-[#343A40]" onClick={handleClose}>
               <ChevronLeft className="h-4 w-4" />
             </Button>
             <span>{teamName} / {projectName} / {featureName} / {epicName} / {ticketName}</span>
@@ -85,8 +247,8 @@ export default function TicketView() {
               Planning Poker
             </Button>
             <div className="ml-auto">
-              <Badge variant="outline" className="border-green-500 text-green-600 bg-white">
-                To Do
+              <Badge variant="outline" className={statusColorClass(status)}>
+                {status}
               </Badge>
             </div>
           </div>
@@ -164,6 +326,47 @@ export default function TicketView() {
           </div>
         </div>
       </DialogContent>
+      {isDeleteDialogOpen && (
+        <Dialog defaultOpen onOpenChange={(open) => { if (!open) cancelDelete() }}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Confirm Delete</DialogTitle>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={cancelDelete}>Cancel</Button>
+              <Button variant="destructive" onClick={confirmDelete}>Delete</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+      {isDeleteDialogOpen2 && (
+        <Dialog defaultOpen onOpenChange={(open) => { if (!open) cancelDelete2() }}>
+          <DialogContent style={{ position: 'absolute', top: dialogPosition2.top, left: dialogPosition2.left }}>
+            <DialogHeader>
+              <DialogTitle>Are you really sure ?</DialogTitle>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={confirmDelete2}>Delete</Button>
+              <Button variant="destructive" onClick={cancelDelete2}>Cancel</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {isDeleteDialogOpen3 && (
+        <Dialog defaultOpen onOpenChange={(open) => { if (!open) cancelDelete3() }}>
+          <DialogContent style={{ position: 'absolute', top: dialogPosition3.top, left: dialogPosition3.left }}>
+            <DialogHeader>
+              <DialogTitle>Are you really, really, reeeeaaally sure ?</DialogTitle>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="default" onClick={confirmDelete3}>Delete</Button>
+              <Button variant="default" onClick={cancelDelete3}>Cancel</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+
     </Dialog>
   )
 }
