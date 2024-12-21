@@ -1,5 +1,5 @@
-import React, { createContext, useState, useEffect, Dispatch, SetStateAction, ReactNode, useCallback } from 'react';
-import { deleteTicket, getTest, getTickets, getTicket, putTicketStatus, postTicket, getUsers, getUser } from '../lib/api';
+import { createContext, useState, useEffect, Dispatch, SetStateAction, ReactNode, useCallback } from 'react';
+import { deleteTicket, getTest, getTickets, getTicket, putTicketStatus, postTicket, getUsers, getUser,avalabilityUser } from '../lib/api';
 
 interface AppContextType {
   data: any;
@@ -15,6 +15,8 @@ interface AppContextType {
   user: any;
   fetchUsers: () => Promise<void>;
   fetchUser: (userId: number) => Promise<void>;
+  userAvailability: any;
+  fetchUserAvailability: (userId: number) => Promise<void>;
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -99,6 +101,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   const [users, setUsers] = useState<any[]>([]);
   const [user, setUser] = useState<any>(null);
+  const [userAvailability, setUserAvailability] = useState<any>(null);
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -127,6 +130,18 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
+  const fetchUserAvailability = useCallback(async (userId: number) => {
+    try {
+      const result = await avalabilityUser(userId);
+      setUserAvailability(result.data);
+      return result.data;
+    } catch (error) {
+      console.error('Error fetching user availability:', error);
+    }
+  }, []);
+
+  
+
 
   return (
     <AppContext.Provider value={{
@@ -142,7 +157,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       users,
       fetchUsers,
       user,
-      fetchUser
+      fetchUser,
+      userAvailability,
+      fetchUserAvailability
     }}>
       {children}
     </AppContext.Provider>

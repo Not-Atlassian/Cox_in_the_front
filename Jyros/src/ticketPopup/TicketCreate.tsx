@@ -93,6 +93,19 @@ export default function Component() {
     }
   }
 
+  const priorityToNumber = (priority: string) => {
+    switch (priority) {
+      case "High":
+        return 3
+      case "Medium":
+        return 2
+      case "Low":
+        return 1
+      default:
+        return 0
+    }
+  }
+
   const [teamName, setTeamName] = useState("Team AB")
   const [projectName, setProjectName] = useState("Project X")
   const [featureName, setFeatureName] = useState("Feature Y")
@@ -120,6 +133,7 @@ export default function Component() {
       parentId: parentId,
       sprintId: parentId,
       createdBy: reporterId,
+      priority: priorityToNumber(priority),
       status: status,
       storyPoints: storyPlates,
     };

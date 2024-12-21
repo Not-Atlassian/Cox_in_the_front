@@ -1,5 +1,6 @@
 'use client'
 
+
 import { useState } from 'react'
 import { ArrowUpDown, BaggageClaim, ChevronDown, ChevronDownCircle, ChevronUp, Icon, PlusCircleIcon } from 'lucide-react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -14,11 +15,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import SearchBar from '@/components/SearchBar/SearchBar'
-
 import './TaskTable.css'
 import { Badge } from '../ui/badge'
 import UserCard from '../Shared/UserCard/UserCard'
-
 
 const ForkIcon = () => (
   <svg
@@ -37,6 +36,7 @@ const ForkIcon = () => (
   </svg>
 )
 
+
 const tasksData = [
   { task: 'Task 1', title: 'Title 1', priority: 1, status: 'Cooking' , shift: 'Shift 1'},
   { task: 'Task 2', title: 'Title 2', priority: 2, status: 'To Do', shift: 'Shift 2' },
@@ -51,6 +51,7 @@ const shiftsData = [
   { task: 'Shift 1', title: 'Title 1', startDate: '2022-10-01', endDate: '2022-10-03', description: 'Description 1' },
   { task: 'Shift 2', title: 'Title 2', startDate: '2022-10-04', endDate: '2022-10-06', description: 'Description 2' },
 ]
+
 
 const filterList = ['Bon appétit', 'In Plating', 'Cooking', 'To Do']
 
@@ -69,6 +70,37 @@ const FilterableTaskTable = () => {
   // const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set()) // Track selected tasks
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+
+  const {tickets,fetchTickets} = useContext(AppContext) as any;
+
+ useEffect(() => {
+    const asyncFunc = async () => {
+      await fetchTickets();
+    };
+    asyncFunc();
+  }, [fetchTickets]);
+
+useEffect(() => {
+  const asyncFunc = async () => {
+    if (!tickets || tickets.length === 0) {
+      console.error('No tickets available');
+      return;
+    }
+
+    console.log("tickets", tickets);
+
+    const newTasks = tickets.map((ticket: any) => ({
+      task: ticket.storyId.toString(),
+      title: ticket.title,
+      priority: ticket.priority,
+      status: ticket.status,
+    }));
+
+    tasks = newTasks;
+  }
+  asyncFunc();
+}, [tickets])
+
 
   const handleFilterChange = (filter: string, isChecked: boolean) => {
     setSelectedFilters((prev) => ({ ...prev, [filter]: isChecked }))

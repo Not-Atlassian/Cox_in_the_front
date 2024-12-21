@@ -79,8 +79,8 @@ export const deleteTicket = async (ticketId: number) => {
 
 export const getUsers = async () => {
   try {
-    const response = await api.get('/api/User'); // Replace '/api/User' with your actual endpoint
-    console.log(response);
+    const response = await api.get('/api/User/good'); // Replace '/api/User' with your actual endpoint
+    console.log("Users",response);
     return response;
   } catch (error) {
     console.error('Error fetching user data:', error);
@@ -91,6 +91,16 @@ export const getUsers = async () => {
 export const getUser = async (userId: number) => {
   try {
     const response = await api.get(`/api/User/${userId}`); // Replace '/api/User' with your actual endpoint
+    return response;
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    throw error;
+  }
+}
+
+export const avalabilityUser = async (userId: number) => {
+  try {
+    const response = await api.get(`/api/User/availability_points/${userId}`); // Replace '/api/User' with your actual endpoint
     return response;
   } catch (error) {
     console.error('Error fetching user data:', error);
