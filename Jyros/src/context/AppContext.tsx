@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, Dispatch, SetStateAction, ReactNode, useCallback } from 'react';
-import { deleteTicket, getTest, getTickets, getTicket, putTicketStatus, postTicket, getUsers, getUser,avalabilityUser } from '../lib/api';
+import { deleteTicket, getTest, getTickets, getTicket, putTicketStatus, postTicket, getUsers, getUser,avalabilityUser, getShifts, getUsersInShift, postAdjustment, putTeamMemberAvailability } from '../lib/api';
 
 interface AppContextType {
   data: any;
@@ -16,7 +16,13 @@ interface AppContextType {
   fetchUsers: () => Promise<void>;
   fetchUser: (userId: number) => Promise<void>;
   userAvailability: any;
-  fetchUserAvailability: (userId: number) => Promise<void>;
+  fetchUserAvailability: (userId: number, sprintId: number) => Promise<void>;
+  shifts: any[];
+  fetchShifts: () => Promise<void>;
+  usersInShift: any[];
+  fetchUsersInShift: (sprintId: number) => Promise<void>;
+  addAdjustment: (sprintId:number ,adjustment: any) => void;
+  updateAvailability: (userId: number, sprintId: number, availability: any) => Promise<void>;
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -101,8 +107,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   const [users, setUsers] = useState<any[]>([]);
   const [user, setUser] = useState<any>(null);
-  const [userAvailability, setUserAvailability] = useState<any>(null);
-
+  
   const fetchUsers = useCallback(async () => {
     try {
       const result = await getUsers();
@@ -112,15 +117,15 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error fetching users:', error);
     }
   }, []);
-
+  
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
-
+  
   useEffect(() => {
     fetchUsers();
   }, []);
-
+  
   const fetchUser = useCallback(async (userId: number) => {
     try {
       const result = await getUser(userId);
@@ -129,16 +134,58 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error fetching user:', error);
     }
   }, []);
-
-  const fetchUserAvailability = useCallback(async (userId: number) => {
+  
+  // ------------------- 3. User Availability Api -------------------
+  const [userAvailability, setUserAvailability] = useState<any>(null);
+  const [shifts, setShifts] = useState<any[]>([]);
+  const [usersInShift, setUsersInShift] = useState<any[]>([]);
+  
+  const fetchUserAvailability = useCallback(async (userId: number, sprintId: number) => {
     try {
-      const result = await avalabilityUser(userId);
+      const result = await avalabilityUser(userId,sprintId);
       setUserAvailability(result.data);
       return result.data;
     } catch (error) {
       console.error('Error fetching user availability:', error);
     }
   }, []);
+
+  const fetchShifts = useCallback(async () => {
+    try {
+      const result = await getShifts();
+      setShifts(result.data);
+      console.log('Fetched shifts:', result.data); // Debug log
+    } catch (error) {
+      console.error('Error fetching shifts:', error);
+    }
+  }, []);
+
+  const fetchUsersInShift = useCallback(async (sprintId: number) => {
+    try {
+      setUsersInShift([]);
+      const result = await getUsersInShift(sprintId);
+      setUsersInShift(result.data);
+    } catch (error) {
+      console.error('Error fetching users in shift:', error);
+    }
+  }, []);
+
+  const addAdjustment = (sprintId:number ,adjustment: any) => {
+    try {
+      postAdjustment(sprintId, adjustment);
+    } catch (error) {
+      console.error('Error adding adjustment:', error);
+    }
+  }
+
+  const updateAvailability = async (userId: number, sprintId: number, availability: any) => {
+    try {
+      await putTeamMemberAvailability(userId, sprintId, availability);
+      await fetchUserAvailability(userId, sprintId);
+    } catch (error) {
+      console.error('Error updating availability:', error);
+    }
+  }
 
   
 
@@ -159,7 +206,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       user,
       fetchUser,
       userAvailability,
-      fetchUserAvailability
+      fetchUserAvailability,
+      shifts,
+      fetchShifts,
+      usersInShift,
+      fetchUsersInShift,
+      addAdjustment,
+      updateAvailability
     }}>
       {children}
     </AppContext.Provider>

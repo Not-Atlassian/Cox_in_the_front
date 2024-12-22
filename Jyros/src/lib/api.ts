@@ -2,7 +2,7 @@ import axios from 'axios';
 import exp from 'constants';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5047', // Ensure this is the correct base URL for your backend
+  baseURL: 'https://localhost:7048', // Ensure this is the correct base URL for your backend
   withCredentials: true,
 });
 
@@ -79,8 +79,8 @@ export const deleteTicket = async (ticketId: number) => {
 
 export const getUsers = async () => {
   try {
-    const response = await api.get('/api/User/good'); // Replace '/api/User' with your actual endpoint
-    console.log("Users",response);
+    const response = await api.get('/api/User'); // Replace '/api/User' with your actual endpoint
+    console.log("Users", response);
     return response;
   } catch (error) {
     console.error('Error fetching user data:', error);
@@ -98,9 +98,11 @@ export const getUser = async (userId: number) => {
   }
 }
 
-export const avalabilityUser = async (userId: number) => {
+// --------------------------- Shift Availability API ---------------------------
+
+export const avalabilityUser = async (userId: number, sprintId: number) => {
   try {
-    const response = await api.get(`/api/User/availability_points/${userId}`); // Replace '/api/User' with your actual endpoint
+    const response = await api.get(`/api/ShiftAvailability/${sprintId}/${userId}`); // Replace '/api/User' with your actual endpoint
     return response;
   } catch (error) {
     console.error('Error fetching user data:', error);
@@ -108,6 +110,46 @@ export const avalabilityUser = async (userId: number) => {
   }
 }
 
+export const getShifts = async () => {
+  try {
+    const response = await api.get('/api/ShiftAvailability/sprints'); // Replace '/api/User' with your actual endpoint
+    console.log("Shifts", response);
+    return response;
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    throw error;
+  }
+}
+
+export const getUsersInShift = async (sprintId: number) => {
+  try {
+    const response = await api.get(`/api/ShiftAvailability/sprints/${sprintId}/users`); // Replace '/api/User' with your actual endpoint
+    return response;
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    throw error;
+  }
+}
+
+export const postAdjustment = async (sprintId: number,  data: any) => {
+  try {
+    const response = await api.post(`/api/ShiftAvailability/${sprintId}/adjustment`, data); // Replace '/api/User' with your actual endpoint
+    return response;
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    throw error;
+  }
+}
+
+export const putTeamMemberAvailability = async (userId: number,sprintId: number , data: any) => {
+  try {
+    const response = await api.put(`/api/ShiftAvailability/${sprintId}/${userId}`, data); // Replace '/api/User' with your actual endpoint
+    return response;
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    throw error;
+  }
+}
 
 
 

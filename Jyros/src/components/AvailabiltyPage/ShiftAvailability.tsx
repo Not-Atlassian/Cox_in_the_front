@@ -30,33 +30,35 @@ interface Adjustment {
 
 export default function ShiftAvailability() {
 
-    const {users, fetchUsers, userAvailability, fetchUserAvailability} = useContext(AppContext) as any;
+    const {usersInShift, fetchUsersInShift, fetchUserAvailability, shifts, fetchShifts, addAdjustment, updateAvailability} = useContext(AppContext) as any;
 
+    const [currentShift, setCurrentShift] = useState<number>(1);
     const [developers, setDevelopers] = useState<Developer[]>([])
 
     useEffect(() => {
-        fetchUsers();
-    }, [fetchUsers]);
+        fetchUsersInShift(currentShift);
+        fetchShifts();
+    }, [fetchUsersInShift, fetchShifts, currentShift]);
 
     useEffect(() => {
       const fetchAvailability = async () => {
-        const devs: Developer[] = await Promise.all(users.map(async (user: any) => {
-          const availability = await fetchUserAvailability(user.userId as number);
-          console.log("Availability",availability);
-          return {
+        let newDevelopers: Developer[] = [];
+        for (let i = 0; i < usersInShift.length; i++) {
+          const user = usersInShift[i];
+          const availability = await fetchUserAvailability(user.userId, currentShift);
+          newDevelopers.push({
             id: user.userId,
             name: user.username,
-            availableDays: availability ? availability : 0,
-          };
-        }));
-        console.log("Developers",developers);
-        setDevelopers(devs);
+            availableDays: availability.availabilityPoints
+          });
+        }
+        setDevelopers(newDevelopers);
       };
   
-      if (users.length > 0) {
+      if (usersInShift.length > 0) {
         fetchAvailability();
       }
-    }, [users, fetchUserAvailability]);
+    }, [usersInShift, fetchUserAvailability]);
   
   const [adjustments, setAdjustments] = useState<Adjustment[]>([
     { days: 1, reason: 'Team Planning Meeting' }
@@ -71,14 +73,22 @@ export default function ShiftAvailability() {
   const totalAdjustments = adjustments.reduce((sum, adj) => sum + adj.days, 0)
 
   const handleUpdateAvailability = () => {
-    // Handle update logic here
-    console.log('Updating availability:', developers)
+    developers.forEach(developer => {
+      let newAvailability = { userId : developer.id,sprintId: currentShift, availabilityPoints: developer.availableDays }
+      updateAvailability(developer.id, currentShift, newAvailability);
+    })
   }
 
   const handleAddAdjustment = () => {
     if (newAdjustment.days && newAdjustment.reason) {
       setAdjustments([...adjustments, newAdjustment])
       setNewAdjustment({ days: 0, reason: '' })
+      let adjustmentToAdd = {
+        AdjustmentPoints: newAdjustment.days,
+        reason: newAdjustment.reason
+      }
+      addAdjustment(currentShift, adjustmentToAdd);
+
     }
   }
 
@@ -86,19 +96,31 @@ export default function ShiftAvailability() {
     setAdjustments(adjustments.filter((_, i) => i !== index))
   }
 
+  const onShiftChange = (e: any) => {
+    setDevelopers([]);
+    setAdjustments([]);
+    setCurrentShift(e);
+
+  }
+
   return (
     <div className="max-w-4xl mx-auto p-6 pl-0 pr-12 space-y-8">
       <div className="space-y-4">
         <h1 className="text-2xl font-semibold text-center">Shift Availability</h1>
-        
         <div className="flex justify-center">
-          <Select defaultValue="shift1">
+          <Select
+            value={currentShift.toString()}
+            onValueChange={onShiftChange}
+          >
             <SelectTrigger className="w-[250px]">
               <SelectValue placeholder="Select shift" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="shift1">Shift 1</SelectItem>
-              <SelectItem value="shift2">Shift 2</SelectItem>
+              {shifts.map((shift: any) => (
+          <SelectItem key={shift.sprintId} value={shift.sprintId.toString()}>
+            {shift.name}
+          </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

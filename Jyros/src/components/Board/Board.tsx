@@ -54,7 +54,6 @@ interface ColumnState {
 }
 
 const Tasks = [
-  { id: 'task-1', content: 'Task 1: Bla bla bla bla bla bla', state: '1',priority: 1 ,intId: 9 },
 ]
 
 const initcolumns: ColumnState = {
@@ -115,6 +114,7 @@ export default function Board() {
       }
   
       setStoryTickets(stories);
+      console.log("AAAAAAAAAAAAAAAAAAAAAAA",stories);
       Tasks.splice(0, Tasks.length);
       stories.forEach((story: any) => {
         Tasks.push({

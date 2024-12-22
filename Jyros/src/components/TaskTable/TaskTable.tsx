@@ -1,7 +1,7 @@
 'use client'
 
 
-import { useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { ArrowUpDown, BaggageClaim, ChevronDown, ChevronDownCircle, ChevronUp, Icon, PlusCircleIcon } from 'lucide-react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Utensils, UtensilsCrossed } from 'lucide-react'
@@ -18,6 +18,7 @@ import SearchBar from '@/components/SearchBar/SearchBar'
 import './TaskTable.css'
 import { Badge } from '../ui/badge'
 import UserCard from '../Shared/UserCard/UserCard'
+import { AppContext } from '@/context/AppContext'
 
 const ForkIcon = () => (
   <svg
@@ -38,7 +39,7 @@ const ForkIcon = () => (
 
 
 const tasksData = [
-  { task: 'Task 1', title: 'Title 1', priority: 1, status: 'Cooking' , shift: 'Shift 1'},
+  { task: 'Task 1', title: 'Title 1', priority: 1, status: 'Cooking', shift: 'Shift 1' },
   { task: 'Task 2', title: 'Title 2', priority: 2, status: 'To Do', shift: 'Shift 2' },
   { task: 'Task 3', title: 'Title 3', priority: 3, status: 'Cooking', shift: 'Shift 1' },
   { task: 'Task 4', title: 'Title 4', priority: 1, status: 'Bon appétit', shift: 'Shift 2' },
@@ -71,35 +72,35 @@ const FilterableTaskTable = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
 
-  const {tickets,fetchTickets} = useContext(AppContext) as any;
+  const { tickets, fetchTickets } = useContext(AppContext) as any;
 
- useEffect(() => {
+  useEffect(() => {
     const asyncFunc = async () => {
       await fetchTickets();
     };
     asyncFunc();
   }, [fetchTickets]);
 
-useEffect(() => {
-  const asyncFunc = async () => {
-    if (!tickets || tickets.length === 0) {
-      console.error('No tickets available');
-      return;
+  useEffect(() => {
+    const asyncFunc = async () => {
+      if (!tickets || tickets.length === 0) {
+        console.error('No tickets available');
+        return;
+      }
+
+      console.log("tickets", tickets);
+
+      const newTasks = tickets.map((ticket: any) => ({
+        task: ticket.storyId.toString(),
+        title: ticket.title,
+        priority: ticket.priority,
+        status: ticket.status,
+      }));
+
+      setTasks(newTasks);
     }
-
-    console.log("tickets", tickets);
-
-    const newTasks = tickets.map((ticket: any) => ({
-      task: ticket.storyId.toString(),
-      title: ticket.title,
-      priority: ticket.priority,
-      status: ticket.status,
-    }));
-
-    tasks = newTasks;
-  }
-  asyncFunc();
-}, [tickets])
+    asyncFunc();
+  }, [tickets])
 
 
   const handleFilterChange = (filter: string, isChecked: boolean) => {
@@ -126,7 +127,7 @@ useEffect(() => {
     setIsModalOpen(false);
   };
 
-  
+
   const statusOrder: { [key: string]: number } = {
     "To Do": 1,
     "Cooking": 2,
@@ -159,14 +160,14 @@ useEffect(() => {
   const sortedTasks = [...searchFilteredTasks].sort((a, b) => {
     if (!sortConfig) return 0;
     const { key, direction } = sortConfig;
-    
+
     // Custom comparison for 'status'
     if (key === 'status') {
       const orderA = statusOrder[a.status] || 0;
       const orderB = statusOrder[b.status] || 0;
       return direction === 'asc' ? orderA - orderB : orderB - orderA;
     }
-    
+
     // Default comparison for other fields
     if (a[key] < b[key]) return direction === 'asc' ? -1 : 1;
     if (a[key] > b[key]) return direction === 'asc' ? 1 : -1;
@@ -196,7 +197,7 @@ useEffect(() => {
   }
   const groupedTasks = shifts.map((shift) => {
     const tasksForShift = sortedTasks.filter((task) => task.shift === shift.task);
-  
+
     // Count tasks based on their status
     const statusCounts = tasksForShift.reduce(
       (counts, task) => {
@@ -208,7 +209,7 @@ useEffect(() => {
       },
       { toDo: 0, cooking: 0, inPlating: 0, bonAppetit: 0 }
     );
-  
+
     return {
       shiftName: shift.title,
       velocity: 1,
@@ -216,7 +217,7 @@ useEffect(() => {
       statusCounts, // Add the status counts here
     };
   });
-  
+
 
 
   // Function to get the appropriate class based on status
@@ -260,146 +261,146 @@ useEffect(() => {
       <div className="search-dropdown-div">
         <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
         <div className='dropdown-div'>
-        <DropdownMenu onOpenChange={setIsOpen}>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="w-[150px] justify-between">
-              Filter by
-              {isOpen ? <ChevronUp className="ml-2 h-4 w-4" /> : <ChevronDown className="ml-2 h-4 w-4" />}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56">
-            {filterList.map((filter) => (
-              <DropdownMenuCheckboxItem
-                key={filter}
-                checked={selectedFilters[filter] || false}
-                onCheckedChange={(isChecked) => handleFilterChange(filter, isChecked)}
-              >
-                {filter}
-              </DropdownMenuCheckboxItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <Button 
-          className='bg-white-500 hover:bg-gray-300 text-gray ml-10' 
-          onClick={() => setIsTaskModalOpen(true)}
-        >
-          <PlusCircleIcon size={18}/>
-          Add Task
-        </Button>
-        {isTaskModalOpen && (
-          <div className="modal-overlay">
-            <div className="modal-content">
-              <h2 className="text-xl font-bold mb-4">Create New Task</h2>
-              <form onSubmit={handleCreateTask} className="space-y-4">
-                <div className="form-group">
-                  <label htmlFor="title" className="block font-medium mb-1">Task Title</label>
-                  <input 
-                    id="title" 
-                    name="title" 
-                    className="input-field w-full p-2 border border-gray-300 rounded-md" 
-                    placeholder="Enter task name" 
-                    required 
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="shift" className="block font-medium mb-1">Shift Name</label>
-                  <select 
-                    id="shiftName" 
-                    name="shift" 
-                    className="input-field w-full p-2 border border-gray-300 rounded-md" 
-                    required
-                  >
-                    <option value="" disabled selected>Select a shift</option>
-                    {shifts.map((shift, index) => (
-                      <option key={index} value={shift.task}>
-                        {shift.task}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="priority" className="block font-medium mb-1">Priority</label>
-                  <select 
-                    id="priority" 
-                    name="priority" 
-                    className="input-field w-full p-2 border border-gray-300 rounded-md" 
-                    required
-                  >
-                    <option value="" disabled selected>Select priority</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="status" className="block font-medium mb-1">Status</label>
-                  <select 
-                    id="status" 
-                    name="status" 
-                    className="input-field w-full p-2 border border-gray-300 rounded-md" 
-                    required
-                  >
-                    <option value="" disabled selected>Select priority</option>
-                    <option value="To Do">To Do</option>
-                    <option value="Cooking">Cooking</option>
-                    <option value="In Plating">In Plating</option>
-                    <option value="Bon appétit">Bon appétit</option>
-                    
-                  </select>
-                </div>
-                <div className="form-actions flex items-center justify-end space-x-4">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={() => setIsTaskModalOpen(false)} 
-                    className="bg-gray-200 hover:bg-gray-300 text-gray-800"
-                  >
-                    Cancel
-                  </Button>
-                  <Button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white">
-                    Create
-                  </Button>
-                </div>
-              </form>
+          <DropdownMenu onOpenChange={setIsOpen}>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="w-[150px] justify-between">
+                Filter by
+                {isOpen ? <ChevronUp className="ml-2 h-4 w-4" /> : <ChevronDown className="ml-2 h-4 w-4" />}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              {filterList.map((filter) => (
+                <DropdownMenuCheckboxItem
+                  key={filter}
+                  checked={selectedFilters[filter] || false}
+                  onCheckedChange={(isChecked) => handleFilterChange(filter, isChecked)}
+                >
+                  {filter}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button
+            className='bg-white-500 hover:bg-gray-300 text-gray ml-10'
+            onClick={() => setIsTaskModalOpen(true)}
+          >
+            <PlusCircleIcon size={18} />
+            Add Task
+          </Button>
+          {isTaskModalOpen && (
+            <div className="modal-overlay">
+              <div className="modal-content">
+                <h2 className="text-xl font-bold mb-4">Create New Task</h2>
+                <form onSubmit={handleCreateTask} className="space-y-4">
+                  <div className="form-group">
+                    <label htmlFor="title" className="block font-medium mb-1">Task Title</label>
+                    <input
+                      id="title"
+                      name="title"
+                      className="input-field w-full p-2 border border-gray-300 rounded-md"
+                      placeholder="Enter task name"
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="shift" className="block font-medium mb-1">Shift Name</label>
+                    <select
+                      id="shiftName"
+                      name="shift"
+                      className="input-field w-full p-2 border border-gray-300 rounded-md"
+                      required
+                    >
+                      <option value="" disabled selected>Select a shift</option>
+                      {shifts.map((shift, index) => (
+                        <option key={index} value={shift.task}>
+                          {shift.task}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="priority" className="block font-medium mb-1">Priority</label>
+                    <select
+                      id="priority"
+                      name="priority"
+                      className="input-field w-full p-2 border border-gray-300 rounded-md"
+                      required
+                    >
+                      <option value="" disabled selected>Select priority</option>
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="status" className="block font-medium mb-1">Status</label>
+                    <select
+                      id="status"
+                      name="status"
+                      className="input-field w-full p-2 border border-gray-300 rounded-md"
+                      required
+                    >
+                      <option value="" disabled selected>Select priority</option>
+                      <option value="To Do">To Do</option>
+                      <option value="Cooking">Cooking</option>
+                      <option value="In Plating">In Plating</option>
+                      <option value="Bon appétit">Bon appétit</option>
+
+                    </select>
+                  </div>
+                  <div className="form-actions flex items-center justify-end space-x-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setIsTaskModalOpen(false)}
+                      className="bg-gray-200 hover:bg-gray-300 text-gray-800"
+                    >
+                      Cancel
+                    </Button>
+                    <Button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white">
+                      Create
+                    </Button>
+                  </div>
+                </form>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
         </div>
       </div>
-      
+
 
 
       {groupedTasks.map((group) => (
         <div key={group.shiftName} className="task-group">
           <div className="flex items-center justify-between gap-4 p-2 border border-gray-300 rounded-md bg-white shadow-sm">
-          <div className="flex items-center gap-4">
-            <span className="text-s font-bold text-gray-400">{group.shiftName}</span>
-            <span className="text-s font-bold text-gray-400">Velocity: {group.velocity}</span>
+            <div className="flex items-center gap-4">
+              <span className="text-s font-bold text-gray-400">{group.shiftName}</span>
+              <span className="text-s font-bold text-gray-400">Velocity: {group.velocity}</span>
+            </div>
+            <div className="flex items-center gap-4 ml-auto">
+              <span className="text-xs font-bold text-gray-400">To do:
+                <Badge variant="outline" className="status-to-do mr-2">
+                  {group.statusCounts.toDo}
+                </Badge></span>
+              <span className="text-xs font-bold text-gray-400">Cooking:
+                <Badge variant="outline" className="status-cooking mr-2">
+                  {group.statusCounts.cooking}
+                </Badge></span>
+              <span className="text-xs font-bold text-gray-400">In plating:
+                <Badge variant="outline" className="status-in-plating mr-2">
+                  {group.statusCounts.inPlating}
+                </Badge></span>
+              <span className="text-xs font-bold text-gray-400">Bon appétit:
+                <Badge variant="outline" className="status-bon-appetit mr-2">
+                  {group.statusCounts.bonAppetit}
+                </Badge></span>
+            </div>
           </div>
-          <div className="flex items-center gap-4 ml-auto">
-            <span className="text-xs font-bold text-gray-400">To do:  
-              <Badge variant="outline" className="status-to-do mr-2">
-                {group.statusCounts.toDo}
-              </Badge></span>
-            <span className="text-xs font-bold text-gray-400">Cooking:
-              <Badge variant="outline" className="status-cooking mr-2">
-                {group.statusCounts.cooking}
-              </Badge></span>
-            <span className="text-xs font-bold text-gray-400">In plating: 
-              <Badge variant="outline" className="status-in-plating mr-2">
-                {group.statusCounts.inPlating}
-              </Badge></span>
-            <span className="text-xs font-bold text-gray-400">Bon appétit: 
-              <Badge variant="outline" className="status-bon-appetit mr-2">
-                {group.statusCounts.bonAppetit}
-              </Badge></span>
-          </div>
-        </div>
           <Table className="task-table">
             <TableHeader>
               <TableRow className="bg-gray-100">
-                  <TableHead className="w-[100px]">
+                <TableHead className="w-[100px]">
                   <Checkbox
                     checked={sortedTasks.length > 0 && sortedTasks.every((task) => selectedTasks.has(task.task))}
                     onCheckedChange={handleSelectAll}
@@ -408,13 +409,13 @@ useEffect(() => {
                   Task
                 </TableHead>
                 <TableHead onClick={() => handleSort('title')} className="cursor-pointer w-[150px]">
-                  Title <ArrowUpDown className='inline h-4 w-4'/>
+                  Title <ArrowUpDown className='inline h-4 w-4' />
                 </TableHead>
                 <TableHead onClick={() => handleSort('priority')} className="cursor-pointer w-[100px]">
-                  Priority <ArrowUpDown className='inline h-4 w-4'/>
+                  Priority <ArrowUpDown className='inline h-4 w-4' />
                 </TableHead>
                 <TableHead onClick={() => handleSort('status')} className="cursor-pointer w-[200px] text-center">
-                  Status <ArrowUpDown className='inline h-4 w-4'/>
+                  Status <ArrowUpDown className='inline h-4 w-4' />
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -438,8 +439,8 @@ useEffect(() => {
                       Parent
                     </Badge>
                     <div className={`${getStatusClass(task.status)} status-div`}>
-                        {task.status} 
-                        <ChevronDownCircle />
+                      {task.status}
+                      <ChevronDownCircle />
                     </div>
                     <img className="user-logo" src="src/assets/user_logo.png"></img>
                   </TableCell>
@@ -450,75 +451,75 @@ useEffect(() => {
         </div>
       ))}
 
-    <div>
-      {/* Modal for Shift Creation */}
-      <Button onClick={() => setIsModalOpen(true)} className="bg-white-500 hover:bg-gray-300 text-gray">
-        <PlusCircleIcon size={18} /> Create Shift
-      </Button>
-      {isModalOpen && (
-      <div className="modal-overlay">
-        <div className="modal-content">
-          <h2 className="text-xl font-bold mb-4">Create New Shift</h2>
-          <form onSubmit={handleCreateShift} className="space-y-4">
-            <div className="form-group">
-              <label htmlFor="title" className="block font-medium mb-1">Shift Name</label>
-              <input 
-                id="title" 
-                name="title" 
-                className="input-field w-full p-2 border border-gray-300 rounded-md" 
-                placeholder="Enter shift name" 
-                required 
-              />
+      <div>
+        {/* Modal for Shift Creation */}
+        <Button onClick={() => setIsModalOpen(true)} className="bg-white-500 hover:bg-gray-300 text-gray">
+          <PlusCircleIcon size={18} /> Create Shift
+        </Button>
+        {isModalOpen && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <h2 className="text-xl font-bold mb-4">Create New Shift</h2>
+              <form onSubmit={handleCreateShift} className="space-y-4">
+                <div className="form-group">
+                  <label htmlFor="title" className="block font-medium mb-1">Shift Name</label>
+                  <input
+                    id="title"
+                    name="title"
+                    className="input-field w-full p-2 border border-gray-300 rounded-md"
+                    placeholder="Enter shift name"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="startDate" className="block font-medium mb-1">Start Date</label>
+                  <input
+                    id="startDate"
+                    name="startDate"
+                    type="date"
+                    className="input-field w-full p-2 border border-gray-300 rounded-md"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="endDate" className="block font-medium mb-1">End Date</label>
+                  <input
+                    id="endDate"
+                    name="endDate"
+                    type="date"
+                    className="input-field w-full p-2 border border-gray-300 rounded-md"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="description" className="block font-medium mb-1">Description</label>
+                  <textarea
+                    id="description"
+                    name="description"
+                    className="input-field w-full p-2 border border-gray-300 rounded-md"
+                    // rows="4" 
+                    placeholder="Enter shift description"
+                    required
+                  ></textarea>
+                </div>
+                <div className="form-actions flex items-center justify-end space-x-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsModalOpen(false)}
+                    className="bg-gray-200 hover:bg-gray-300 text-gray-800"
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white">
+                    Create
+                  </Button>
+                </div>
+              </form>
             </div>
-            <div className="form-group">
-              <label htmlFor="startDate" className="block font-medium mb-1">Start Date</label>
-              <input 
-                id="startDate" 
-                name="startDate" 
-                type="date" 
-                className="input-field w-full p-2 border border-gray-300 rounded-md" 
-                required 
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="endDate" className="block font-medium mb-1">End Date</label>
-              <input 
-                id="endDate" 
-                name="endDate" 
-                type="date" 
-                className="input-field w-full p-2 border border-gray-300 rounded-md" 
-                required 
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="description" className="block font-medium mb-1">Description</label>
-              <textarea 
-                id="description" 
-                name="description" 
-                className="input-field w-full p-2 border border-gray-300 rounded-md" 
-                // rows="4" 
-                placeholder="Enter shift description" 
-                required 
-              ></textarea>
-            </div>
-            <div className="form-actions flex items-center justify-end space-x-4">
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => setIsModalOpen(false)} 
-                className="bg-gray-200 hover:bg-gray-300 text-gray-800"
-              >
-                Cancel
-              </Button>
-              <Button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white">
-                Create
-              </Button>
-            </div>
-          </form>
-        </div>
+          </div>
+        )}
       </div>
-    )}
-    </div>
     </div>
   )
 }
