@@ -13,15 +13,17 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { ArrowLeft, ChevronDown, MoreVertical, Plus, Zap } from 'lucide-react'
+import { ArrowLeft, ChevronDown, HelpCircle, MoreVertical, Plus, Zap } from 'lucide-react'
 import { Utensils, UtensilsCrossed } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import CrossingKnives from "./AnimationKnives/CrossingKnives"
 import EstimationPopup from "./EstimationPopup"
+import DetailsPopup from "./EstimatorDetailsPopup"
 import { DialogTitle } from "@radix-ui/react-dialog"
 import { send } from "process"
 
 import { AppContext } from "@/context/AppContext"
+import EstimatorDetailsPopup from "./EstimatorDetailsPopup"
 
 const ForkIcon = () => (
   <svg
@@ -59,6 +61,8 @@ export default function Component() {
   const [status, setStatus] = useState("To Do")
 
   const [openEstimateDialog, setOpenEstimateDialog] = useState(false);
+  const [openHelpDialog, setOpenHelpDialog] = useState(false);
+
 
   const { tickets, fetchTickets, addTicket } = useContext(AppContext) as any
   
@@ -203,6 +207,21 @@ export default function Component() {
                       <EstimationPopup title = {title} description = {description} handleExit = {handleExitEstimate} setStoryPlates = {setStoryPlates} />
                     </DialogContent>
                   </Dialog>
+
+                  <Dialog open={openHelpDialog} onOpenChange={setOpenHelpDialog}>
+  <DialogTrigger asChild>
+    <Button variant="secondary" size="sm" className="bg-[#F1F3F5] hover:bg-[#E9ECEF] text-gray-700">
+      <HelpCircle className="h-4 w-4" />
+    </Button>
+  </DialogTrigger>
+  <DialogContent className="p-4 w-full h-full max-w-none max-h-none overflow-auto">
+    <div className="w-full h-full">
+      <EstimatorDetailsPopup />
+    </div>
+  </DialogContent>
+</Dialog>
+
+
                   <Button variant="secondary" size="sm" className="bg-[#F1F3F5] hover:bg-[#E9ECEF] text-gray-700">
                       Planning Poker
                   </Button>
