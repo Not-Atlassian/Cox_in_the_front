@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, Dispatch, SetStateAction, ReactNode, useCallback } from 'react';
-import { deleteTicket, getTest, getTickets, getTicket, putTicketStatus, postTicket, getUsers, getUser,avalabilityUser, getShifts, getUsersInShift, postAdjustment, putTeamMemberAvailability } from '../lib/api';
+import { deleteTicket, getTest, getTickets, getTicket, putTicketStatus, postTicket, getUsers, getUser,avalabilityUser, getShifts, getUsersInShift, postAdjustment, putTeamMemberAvailability, getShiftAdjustment, getShiftAdjustmentList } from '../lib/api';
 
 interface AppContextType {
   data: any;
@@ -23,6 +23,11 @@ interface AppContextType {
   fetchUsersInShift: (sprintId: number) => Promise<void>;
   addAdjustment: (sprintId:number ,adjustment: any) => void;
   updateAvailability: (userId: number, sprintId: number, availability: any) => Promise<void>;
+  shiftAdjustment: any;
+  fetchShiftAdjustment: (sprintId: number) => Promise<void>;
+  fetchShiftAdjustmentList: (sprintId: number) => Promise<any>;
+  adjustments: any[];
+  setAdjustments: Dispatch<SetStateAction<any[]>>;
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -139,6 +144,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [userAvailability, setUserAvailability] = useState<any>(null);
   const [shifts, setShifts] = useState<any[]>([]);
   const [usersInShift, setUsersInShift] = useState<any[]>([]);
+  const [shiftAdjustment, setShiftAdjustment] = useState<any[]>([]);
+  const [adjustments, setAdjustments] = useState<any[]>([]);
   
   const fetchUserAvailability = useCallback(async (userId: number, sprintId: number) => {
     try {
@@ -187,6 +194,26 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
+  const fetchShiftAdjustment = useCallback( async (sprintId: number) => {
+    try {
+      const result = await getShiftAdjustment(sprintId);
+      setShiftAdjustment(result.data);
+      return result.data;
+    } catch (error) {
+      console.error('Error fetching shift adjustment:', error);
+    }
+  }, []);
+
+  const fetchShiftAdjustmentList = useCallback( async (sprintId: number) => {
+    try {
+      const result = await getShiftAdjustmentList(sprintId);
+      setAdjustments(result.data);
+      return result.data;
+    } catch (error) {
+      console.error('Error fetching shift adjustment:', error);
+    }
+  }, []);
+
   
 
 
@@ -212,7 +239,12 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       usersInShift,
       fetchUsersInShift,
       addAdjustment,
-      updateAvailability
+      updateAvailability,
+      shiftAdjustment,
+      fetchShiftAdjustment,
+      fetchShiftAdjustmentList,
+      adjustments,
+      setAdjustments
     }}>
       {children}
     </AppContext.Provider>

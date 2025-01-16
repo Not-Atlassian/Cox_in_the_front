@@ -24,13 +24,13 @@ interface Developer {
 }
 
 interface Adjustment {
-  days: number
+  adjustmentPoints: number
   reason: string
 }
 
 export default function ShiftAvailability() {
 
-    const {usersInShift, fetchUsersInShift, fetchUserAvailability, shifts, fetchShifts, addAdjustment, updateAvailability} = useContext(AppContext) as any;
+    const {usersInShift, fetchUsersInShift, fetchUserAvailability, shifts, fetchShifts, fetchShiftAdjustment, addAdjustment, updateAvailability, shiftAdjustment, fetchShiftAdjustmentList, setAdjustments,adjustments} = useContext(AppContext) as any;
 
     const [currentShift, setCurrentShift] = useState<number>(1);
     const [developers, setDevelopers] = useState<Developer[]>([])
@@ -38,39 +38,55 @@ export default function ShiftAvailability() {
     useEffect(() => {
         fetchUsersInShift(currentShift);
         fetchShifts();
-    }, [fetchUsersInShift, fetchShifts, currentShift]);
-
-    useEffect(() => {
-      const fetchAvailability = async () => {
-        let newDevelopers: Developer[] = [];
-        for (let i = 0; i < usersInShift.length; i++) {
-          const user = usersInShift[i];
-          const availability = await fetchUserAvailability(user.userId, currentShift);
-          newDevelopers.push({
-            id: user.userId,
-            name: user.username,
-            availableDays: availability.availabilityPoints
-          });
+        fetchShiftAdjustment(currentShift);
+        const fetchTest = async () => {
+        let test = await fetchShiftAdjustmentList(currentShift);
+        console.log("Test-----------------", test);
         }
-        setDevelopers(newDevelopers);
+        fetchTest();
+        
+      }, [fetchUsersInShift, fetchShifts, currentShift]);
+      
+      useEffect(() => {
+        const fetchAvailability = async () => {
+          let newDevelopers: Developer[] = [];
+          for (let i = 0; i < usersInShift.length; i++) {
+            const user = usersInShift[i];
+            const availability = await fetchUserAvailability(user.userId, currentShift);
+            newDevelopers.push({
+              id: user.userId,
+              name: user.username,
+              availableDays: availability.availabilityPoints
+            });
+          }
+          setDevelopers(newDevelopers);
+          const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+          sleep(1000);
+          // setTotalDays(developers.reduce((sum, dev) => sum + dev.availableDays, 0));
       };
   
       if (usersInShift.length > 0) {
         fetchAvailability();
       }
     }, [usersInShift, fetchUserAvailability]);
+
+
+    useEffect(() => {
+      setTotalDays(developers.reduce((sum, dev) => sum + dev.availableDays, 0));
+    }, [developers])
   
-  const [adjustments, setAdjustments] = useState<Adjustment[]>([
-    { days: 1, reason: 'Team Planning Meeting' }
-  ])
+  // const [adjustments, setAdjustments] = useState<Adjustment[]>([
+  //   { days: 1, reason: 'Team Planning Meeting' }
+  // ])
   
   const [newAdjustment, setNewAdjustment] = useState<Adjustment>({
-    days: 0,
+    adjustmentPoints: 0,
     reason: ''
   })
 
-  const totalDays = developers.reduce((sum, dev) => sum + dev.availableDays, 0)
-  const totalAdjustments = adjustments.reduce((sum, adj) => sum + adj.days, 0)
+  // let totalDays = developers.reduce((sum, dev) => sum + dev.availableDays, 0)
+  const [totalDays, setTotalDays] = useState(0);
+
 
   const handleUpdateAvailability = () => {
     developers.forEach(developer => {
@@ -80,14 +96,16 @@ export default function ShiftAvailability() {
   }
 
   const handleAddAdjustment = () => {
-    if (newAdjustment.days && newAdjustment.reason) {
+    if (newAdjustment.adjustmentPoints && newAdjustment.reason) {
       setAdjustments([...adjustments, newAdjustment])
-      setNewAdjustment({ days: 0, reason: '' })
+      setNewAdjustment({ adjustmentPoints: 0, reason: '' })
       let adjustmentToAdd = {
-        AdjustmentPoints: newAdjustment.days,
+        AdjustmentPoints: newAdjustment.adjustmentPoints,
         reason: newAdjustment.reason
       }
       addAdjustment(currentShift, adjustmentToAdd);
+      setTotalDays(totalDays - newAdjustment.adjustmentPoints);
+
 
     }
   }
@@ -137,14 +155,14 @@ export default function ShiftAvailability() {
             <svg width="20" height="20" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M8 3V13M3 8H13" stroke="currentColor" strokeWidth="2"/>
             </svg>
-            <span>{totalAdjustments} Adjustments</span>
+            <span>{shiftAdjustment} Adjustments</span>
           </div>
           <span>•</span>
           <div className="flex items-center gap-2">
             <svg width="20" height="20" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="2"/>
             </svg>
-            <span>{totalDays + totalAdjustments} Total Days</span>
+            <span>{totalDays - shiftAdjustment} Total Days</span>
           </div>
         </div>
       </div>
@@ -191,10 +209,10 @@ export default function ShiftAvailability() {
             <label className="text-base text-muted-foreground">Days</label>
             <Input
               type="number"
-              value={newAdjustment.days || ''}
+              value={newAdjustment.adjustmentPoints || ''}
               onChange={(e) => setNewAdjustment({
                 ...newAdjustment,
-                days: parseInt(e.target.value)
+                adjustmentPoints: parseInt(e.target.value)
               })}
             />
           </div>
@@ -220,7 +238,7 @@ export default function ShiftAvailability() {
               className="flex items-center justify-between p-4 bg-muted rounded-lg"
             >
               <span className="text-base">
-                {adjustment.days} {adjustment.days === 1 ? 'day' : 'days'} - {adjustment.reason}
+                {adjustment.adjustmentPoints} {adjustment.adjustmentPoints === 1 ? 'day' : 'days'} - {adjustment.reason}
               </span>
               <Button
                 variant="ghost"

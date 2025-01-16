@@ -79,7 +79,7 @@ export const deleteTicket = async (ticketId: number) => {
 
 export const getUsers = async () => {
   try {
-    const response = await api.get('/api/User'); // Replace '/api/User' with your actual endpoint
+    const response = await api.get('/api/User'); 
     console.log("Users", response);
     return response;
   } catch (error) {
@@ -90,7 +90,7 @@ export const getUsers = async () => {
 
 export const getUser = async (userId: number) => {
   try {
-    const response = await api.get(`/api/User/${userId}`); // Replace '/api/User' with your actual endpoint
+    const response = await api.get(`/api/User/${userId}`); 
     return response;
   } catch (error) {
     console.error('Error fetching user data:', error);
@@ -102,7 +102,7 @@ export const getUser = async (userId: number) => {
 
 export const avalabilityUser = async (userId: number, sprintId: number) => {
   try {
-    const response = await api.get(`/api/ShiftAvailability/${sprintId}/${userId}`); // Replace '/api/User' with your actual endpoint
+    const response = await api.get(`/api/ShiftAvailability/${sprintId}/${userId}`); 
     return response;
   } catch (error) {
     console.error('Error fetching user data:', error);
@@ -112,7 +112,7 @@ export const avalabilityUser = async (userId: number, sprintId: number) => {
 
 export const getShifts = async () => {
   try {
-    const response = await api.get('/api/ShiftAvailability/sprints'); // Replace '/api/User' with your actual endpoint
+    const response = await api.get('/api/ShiftAvailability/sprints'); 
     console.log("Shifts", response);
     return response;
   } catch (error) {
@@ -123,7 +123,7 @@ export const getShifts = async () => {
 
 export const getUsersInShift = async (sprintId: number) => {
   try {
-    const response = await api.get(`/api/ShiftAvailability/sprints/${sprintId}/users`); // Replace '/api/User' with your actual endpoint
+    const response = await api.get(`/api/ShiftAvailability/sprints/${sprintId}/users`); 
     return response;
   } catch (error) {
     console.error('Error fetching user data:', error);
@@ -133,7 +133,7 @@ export const getUsersInShift = async (sprintId: number) => {
 
 export const postAdjustment = async (sprintId: number,  data: any) => {
   try {
-    const response = await api.post(`/api/ShiftAvailability/${sprintId}/adjustment`, data); // Replace '/api/User' with your actual endpoint
+    const response = await api.post(`/api/ShiftAvailability/${sprintId}/adjustment`, data); 
     return response;
   } catch (error) {
     console.error('Error fetching user data:', error);
@@ -143,7 +143,7 @@ export const postAdjustment = async (sprintId: number,  data: any) => {
 
 export const putTeamMemberAvailability = async (userId: number,sprintId: number , data: any) => {
   try {
-    const response = await api.put(`/api/ShiftAvailability/${sprintId}/${userId}`, data); // Replace '/api/User' with your actual endpoint
+    const response = await api.put(`/api/ShiftAvailability/${sprintId}/${userId}`, data); 
     return response;
   } catch (error) {
     console.error('Error fetching user data:', error);
@@ -151,6 +151,26 @@ export const putTeamMemberAvailability = async (userId: number,sprintId: number 
   }
 }
 
+export const getShiftAdjustment = async (sprintId: number) => {
+  try {
+    const response = await api.get(`/api/ShiftAvailability/${sprintId}/adjustment`); 
+    console.log("Shifts", response);
+    return response;
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    throw error;
+  }
+}
+
+export const getShiftAdjustmentList = async (sprintID: number) => {
+  try {
+    const response = await api.get(`/api/ShiftAvailability/${sprintID}/adjustment/all`); 
+    return response;
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    throw error;
+  }
+}
 
 
 
