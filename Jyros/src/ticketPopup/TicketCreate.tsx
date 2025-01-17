@@ -1,6 +1,6 @@
 'use client'
 
-import { SetStateAction, useContext, useState } from "react"
+import { SetStateAction, useContext, useEffect, useState } from "react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -53,7 +53,7 @@ export default function Component() {
   const [reporter, setReporter] = useState("Unassigned")
   const [reporterId, setReporterId] = useState(0)
   const [team, setTeam] = useState("Unassigned")
-  const [shift, setShift] = useState("(To be implemented)")
+  const [shift, setShift] = useState<{ sprintId: number; name: string } | null>(null);
   const [storyPlates, setStoryPlates] = useState(0)
   const [parent, setParent] = useState("None")
   const [parentId, setParentId] = useState(0)
@@ -64,8 +64,8 @@ export default function Component() {
   const [openHelpDialog, setOpenHelpDialog] = useState(false);
 
 
-  const { tickets, fetchTickets, addTicket } = useContext(AppContext) as any
-  
+  const { tickets, fetchTickets, addTicket, shifts, fetchShifts } = useContext(AppContext) as any
+
 
   const handlePriorityChange = (value: string) => setPriority(value)
   const handleStatusChange = (value: string) => setStatus(value)
@@ -110,6 +110,15 @@ export default function Component() {
     }
   }
 
+  useEffect(() => {
+    const fetch = async () => {
+      await fetchShifts();
+    }
+    fetch();
+    console.log("Test-------------------------------", shifts);
+  }, [])
+
+
   const [teamName, setTeamName] = useState("Team AB")
   const [projectName, setProjectName] = useState("Project X")
   const [featureName, setFeatureName] = useState("Feature Y")
@@ -135,7 +144,7 @@ export default function Component() {
       title: title,
       description: description,
       parentId: parentId,
-      sprintId: parentId,
+      sprintId: shift?.sprintId,
       createdBy: reporterId,
       priority: priorityToNumber(priority),
       status: status,
@@ -160,7 +169,7 @@ export default function Component() {
   const handleExitEstimate = () => {
     setOpenEstimateDialog(false);
   }
-  
+
   return (
     <>
       <div className={`p-4 ${showAnimation ? "opacity-10" : ""}`}>
@@ -199,31 +208,31 @@ export default function Component() {
                         <ChevronDown className="h-3 w-3" />
                         <Zap className="mr-2 h-3 w-3" />
                         <DialogTitle>
-                        Estimate with AI
+                          Estimate with AI
                         </DialogTitle>
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="p-4">
-                      <EstimationPopup title = {title} description = {description} handleExit = {handleExitEstimate} setStoryPlates = {setStoryPlates} />
+                      <EstimationPopup title={title} description={description} handleExit={handleExitEstimate} setStoryPlates={setStoryPlates} />
                     </DialogContent>
                   </Dialog>
 
                   <Dialog open={openHelpDialog} onOpenChange={setOpenHelpDialog}>
-  <DialogTrigger asChild>
-    <Button variant="secondary" size="sm" className="bg-[#F1F3F5] hover:bg-[#E9ECEF] text-gray-700">
-      <HelpCircle className="h-4 w-4" />
-    </Button>
-  </DialogTrigger>
-  <DialogContent className="p-4 w-full h-full max-w-none max-h-none overflow-auto">
-    <div className="w-full h-full">
-      <EstimatorDetailsPopup />
-    </div>
-  </DialogContent>
-</Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="secondary" size="sm" className="bg-[#F1F3F5] hover:bg-[#E9ECEF] text-gray-700">
+                        <HelpCircle className="h-4 w-4" />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="p-4 w-full h-full max-w-none max-h-none overflow-auto">
+                      <div className="w-full h-full">
+                        <EstimatorDetailsPopup />
+                      </div>
+                    </DialogContent>
+                  </Dialog>
 
 
                   <Button variant="secondary" size="sm" className="bg-[#F1F3F5] hover:bg-[#E9ECEF] text-gray-700">
-                      Planning Poker
+                    Planning Poker
                   </Button>
                 </div>
                 <Select value={status} onValueChange={handleStatusChange}>
@@ -299,7 +308,24 @@ export default function Component() {
                     </div>
                     <div className="grid grid-cols-[100px,1fr] items-center gap-2">
                       <Label className="text-sm">Shift</Label>
-                      <span className="text-sm text-gray-600">{shift}</span>
+                      <Select
+                        value={shift?.name}
+                        onValueChange={(selectedName) => {
+                          const selectedShift = shifts.find((s: { name: string }) => s.name === selectedName);
+                          if (selectedShift) setShift(selectedShift);
+                        }}
+                      >
+                        <SelectTrigger className="w-full h-8">
+                          <SelectValue placeholder="Select Shift" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {shifts?.map((shiftItem: { sprintId: number; name: string }) => (
+                            <SelectItem key={shiftItem.sprintId} value={shiftItem.name}>
+                              {shiftItem.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                     <div className="grid grid-cols-[100px,1fr] items-center gap-2">
                       <Label className="text-sm">Story Plates</Label>
