@@ -24,7 +24,7 @@ export default function TicketView({ id, handleClose }: { id: number, handleClos
   const [assignee, setAssignee] = useState("Ion Ionescu")
   const [reporter, setReporter] = useState("Mihai Eminescu")
   const [team, setTeam] = useState("NotAtlassian")
-  const [shift, setShift] = useState("(To be implemented)")
+  const [shift, setShift] = useState(0)
   const [storyPlates, setStoryPlates] = useState(5)
   const [parent, setParent] = useState("blzbalbal bnlab")
   const [priority, setPriority] = useState("Select priority")
@@ -70,6 +70,7 @@ export default function TicketView({ id, handleClose }: { id: number, handleClos
       setTicketDescription(ticket.description);
       setStoryPlates(ticket.storyPoints);
       setStatus(ticket.status);
+      setShift(ticket.sprintId)
     } else {
       console.log("Ticket not found");
     }
