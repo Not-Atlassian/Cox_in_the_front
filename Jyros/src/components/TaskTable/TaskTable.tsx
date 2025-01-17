@@ -38,20 +38,20 @@ const ForkIcon = () => (
 )
 
 
-const tasksData = [
-  { task: 'Task 1', title: 'Title 1', priority: 1, status: 'Cooking', shift: 'Shift 1' },
-  { task: 'Task 2', title: 'Title 2', priority: 2, status: 'To Do', shift: 'Shift 2' },
-  { task: 'Task 3', title: 'Title 3', priority: 3, status: 'Cooking', shift: 'Shift 1' },
-  { task: 'Task 4', title: 'Title 4', priority: 1, status: 'Bon appétit', shift: 'Shift 2' },
-  { task: 'Task 5', title: 'Title 5', priority: 2, status: 'Bon appétit', shift: 'Shift 1' },
-  { task: 'Task 6', title: 'Title 6', priority: 3, status: 'In Plating', shift: 'Shift 2' },
-  { task: 'Task 7', title: 'Title 7', priority: 1, status: 'In Plating', shift: 'Shift 1' },
-]
+// const tasksData = [
+//   { task: 'Task 1', title: 'Title 1', priority: 1, status: 'Cooking', shift: 'Shift 1' },
+//   { task: 'Task 2', title: 'Title 2', priority: 2, status: 'To Do', shift: 'Shift 2' },
+//   { task: 'Task 3', title: 'Title 3', priority: 3, status: 'Cooking', shift: 'Shift 1' },
+//   { task: 'Task 4', title: 'Title 4', priority: 1, status: 'Bon appétit', shift: 'Shift 2' },
+//   { task: 'Task 5', title: 'Title 5', priority: 2, status: 'Bon appétit', shift: 'Shift 1' },
+//   { task: 'Task 6', title: 'Title 6', priority: 3, status: 'In Plating', shift: 'Shift 2' },
+//   { task: 'Task 7', title: 'Title 7', priority: 1, status: 'In Plating', shift: 'Shift 1' },
+// ]
 
-const shiftsData = [
-  { task: 'Shift 1', title: 'Title 1', startDate: '2022-10-01', endDate: '2022-10-03', description: 'Description 1' },
-  { task: 'Shift 2', title: 'Title 2', startDate: '2022-10-04', endDate: '2022-10-06', description: 'Description 2' },
-]
+// const shiftsData = [
+//   { task: 1, title: 'Title 1', startDate: '2022-10-01', endDate: '2022-10-03', description: 'Description 1' },
+//   { task: 2, title: 'Title 2', startDate: '2022-10-04', endDate: '2022-10-06', description: 'Description 2' },
+// ]
 
 
 const filterList = ['Bon appétit', 'In Plating', 'Cooking', 'To Do']
@@ -59,24 +59,27 @@ const filterList = ['Bon appétit', 'In Plating', 'Cooking', 'To Do']
 
 
 const FilterableTaskTable = () => {
-  const [tasks, setTasks] = useState(tasksData);
-  const [shifts, setShifts] = useState(shiftsData);
+  const [tasksLocal, setTasks] = useState([]);
+  const [shiftsLocal, setShifts] = useState([]);
+
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilters, setSelectedFilters] = useState<{ [key: string]: boolean }>({})
   // const [selectedFilters, setSelectedFilters] = useState({});
   const [selectedTasks, setSelectedTasks] = useState(new Set());
   // const [sortConfig, setSortConfig] = useState(null);
   const [isOpen, setIsOpen] = useState(false)
-  const [sortConfig, setSortConfig] = useState<{ key: keyof typeof tasks[0]; direction: 'asc' | 'desc' } | null>(null)
+  const [sortConfig, setSortConfig] = useState<{ key: keyof typeof tickets[0]; direction: 'asc' | 'desc' } | null>(null)
   // const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set()) // Track selected tasks
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
 
-  const { tickets, fetchTickets } = useContext(AppContext) as any;
+  const { tickets, fetchTickets, shifts, fetchShifts, addTicket, addShift } = useContext(AppContext) as any;
 
   useEffect(() => {
     const asyncFunc = async () => {
       await fetchTickets();
+      console.log(tickets); // Log the tickets
     };
     asyncFunc();
   }, [fetchTickets]);
@@ -91,16 +94,45 @@ const FilterableTaskTable = () => {
       console.log("tickets", tickets);
 
       const newTasks = tickets.map((ticket: any) => ({
-        task: ticket.storyId.toString(),
+        taskId: ticket.storyId,
         title: ticket.title,
         priority: ticket.priority,
         status: ticket.status,
+        shiftId: ticket.sprintId,
       }));
 
       setTasks(newTasks);
     }
     asyncFunc();
   }, [tickets])
+
+  useEffect(() => {
+    const asyncFunc = async () => {
+      await fetchShifts();
+      console.log(shifts); // Log the tickets
+    };
+    asyncFunc();
+  }, [fetchShifts]);
+
+  useEffect(() => {
+    const asyncFunc = async () => {
+      if(!shifts || shifts.length === 0) {
+        console.error('No shifts available');
+        return;
+      }
+
+      console.log("shifts", shifts);
+      const newShifts = shifts.map((shift: any) => ({
+        shiftId: shift.sprintId,
+        name: shift.name,
+        startDate: shift.startDate,
+        endDate: shift.endDate,
+        goal: shift.goal,
+      }));
+      setShifts(newShifts);
+    }
+    asyncFunc();
+  }, [shifts])
 
 
   const handleFilterChange = (filter: string, isChecked: boolean) => {
@@ -110,20 +142,21 @@ const FilterableTaskTable = () => {
   const handleCreateShift = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const target = event.target as typeof event.target & {
-      title: { value: string };
+      name: { value: string };
       startDate: { value: string };
       endDate: { value: string };
-      description: { value: string };
+      goal: { value: string };
     };
     event.preventDefault();
     const newShift = {
-      task: `Shift ${shifts.length + 1}`,
-      title: target.title.value,
+      shiftId: shifts.length + 1,
+      name: target.name.value,
       startDate: target.startDate.value,
       endDate: target.endDate.value,
-      description: target.description.value,
+      goal: target.goal.value,
     };
-    setShifts((prev) => [...prev, newShift]);
+
+    addShift(newShift);
     setIsModalOpen(false);
   };
 
@@ -135,7 +168,7 @@ const FilterableTaskTable = () => {
     "Bon appétit": 4,
   }
 
-  const handleSort = (key: keyof typeof tasks[0]) => {
+  const handleSort = (key: keyof typeof tasksLocal[0]) => {
     setSortConfig((prev) => ({
       key,
       direction: prev?.key === key && prev.direction === "asc" ? "desc" : "asc",
@@ -143,7 +176,7 @@ const FilterableTaskTable = () => {
   };
 
   // Filter tasks based on selected filters
-  const filteredTasks = tasks.filter((task) => {
+  const filteredTasks = tasksLocal.filter((task) => {
     if (Object.values(selectedFilters).every((v) => !v)) return true
     return selectedFilters[task.status]
   })
@@ -152,12 +185,12 @@ const FilterableTaskTable = () => {
   const searchFilteredTasks = filteredTasks.filter((task) => {
     const normalizedQuery = searchQuery.replace(/\s+/g, '').toLowerCase();
     const normalizedTitle = task.title.replace(/\s+/g, '').toLowerCase();
-    const normalizedTask = task.task.replace(/\s+/g, '').toLowerCase();
-    return normalizedTitle.includes(normalizedQuery) || normalizedTask.includes(normalizedQuery);
+    return normalizedTitle.includes(normalizedQuery);
   });
 
   // Sort tasks based on sortConfig
   const sortedTasks = [...searchFilteredTasks].sort((a, b) => {
+    console.log("searchFilteredTasks", searchFilteredTasks);
     if (!sortConfig) return 0;
     const { key, direction } = sortConfig;
 
@@ -177,7 +210,7 @@ const FilterableTaskTable = () => {
   // Handle selecting or deselecting all tasks
   const handleSelectAll = (isChecked: boolean) => {
     if (isChecked) {
-      setSelectedTasks(new Set(sortedTasks.map((task) => task.task))) // Select all tasks
+      setSelectedTasks(new Set(sortedTasks.map((task) => task.taskId))) // Select all tasks
     } else {
       setSelectedTasks(new Set()) // Deselect all tasks
     }
@@ -195,8 +228,22 @@ const FilterableTaskTable = () => {
       return updated
     })
   }
-  const groupedTasks = shifts.map((shift) => {
-    const tasksForShift = sortedTasks.filter((task) => task.shift === shift.task);
+  const groupedTasks = shiftsLocal.map((shift) => {
+    
+    console.log("sortedTasks", sortedTasks);
+    const tasksForShift = sortedTasks.filter(
+      (task) => 
+        // console.log("eq", task.shiftId === shift.shiftId);
+        task.shiftId === shift.shiftId
+        // console.log(typeof task.shiftId);
+        // console.log(typeof shift.shiftId);
+        // console.log("task.shiftId", task.shiftId);
+        // console.log("shift.shiftId", shift.shiftId);
+      
+    );
+
+
+    console.log("tasksForShift", tasksForShift);
 
     // Count tasks based on their status
     const statusCounts = tasksForShift.reduce(
@@ -245,13 +292,13 @@ const FilterableTaskTable = () => {
       status: { value: string };
     };
     const newTask = {
-      task: `Task ${tasks.length + 1}`,
+      taskId: tasksLocal.length + 1,
       title: target.title.value,
-      shift: target.shift.value,
+      shiftId: parseInt(target.shift.value),
       priority: parseInt(target.priority.value),
       status: target.status.value,
     };
-    setTasks((prev) => [...prev, newTask]);
+    addTicket(newTask);
     setIsTaskModalOpen(false);
   }
 
@@ -312,8 +359,8 @@ const FilterableTaskTable = () => {
                     >
                       <option value="" disabled selected>Select a shift</option>
                       {shifts.map((shift, index) => (
-                        <option key={index} value={shift.task}>
-                          {shift.task}
+                        <option key={index} value={shift.taskId}>
+                          {shift.taskId}
                         </option>
                       ))}
                     </select>
@@ -400,13 +447,14 @@ const FilterableTaskTable = () => {
           <Table className="task-table">
             <TableHeader>
               <TableRow className="bg-gray-100">
-                <TableHead className="w-[100px]">
-                  <Checkbox
-                    checked={sortedTasks.length > 0 && sortedTasks.every((task) => selectedTasks.has(task.task))}
+                <TableHead className="w-[100px] pl-2">
+                  {/* <Checkbox
+                    checked={sortedTasks.length > 0 && sortedTasks.every((task) => selectedTasks.has(task.taskId))}
                     onCheckedChange={handleSelectAll}
                     className="custom-checkbox"
-                  />
-                  Task
+                    color='grey'
+                  /> */}
+                Task
                 </TableHead>
                 <TableHead onClick={() => handleSort('title')} className="cursor-pointer w-[150px]">
                   Title <ArrowUpDown className='inline h-4 w-4' />
@@ -421,14 +469,14 @@ const FilterableTaskTable = () => {
             </TableHeader>
             <TableBody>
               {group.tasks.map((task) => (
-                <TableRow key={task.task}>
+                <TableRow key={task.taskId}>
                   <TableCell className="font-medium truncate max-w-[100px] text-gray-500" >
                     <Checkbox
-                      checked={selectedTasks.has(task.task)}
-                      onCheckedChange={(isChecked) => handleTaskSelect(task.task, isChecked as boolean)}
+                      checked={selectedTasks.has(task.taskId)}
+                      onCheckedChange={(isChecked) => handleTaskSelect(task.taskId, isChecked as boolean)}
                       className="mr-2 custom-checkbox"
                     />
-                    {task.task}
+                    Task {task.taskId}
                   </TableCell>
                   <TableCell className='truncate max-w-[150px] font-bold'>{task.title} </TableCell>
                   <TableCell className='truncate max-w-[100px]'>
