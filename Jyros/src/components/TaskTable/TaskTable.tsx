@@ -79,7 +79,7 @@ const FilterableTaskTable = () => {
   
   const [viewOpen, setViewOpen] = useState<boolean>(false);
 
-  const { tickets, fetchTickets, shifts, fetchShifts, addTicket, addShift } = useContext(AppContext) as any;
+  const { tickets, fetchTickets, shifts, fetchShifts, addTicket, addShift, availabilities, fetchSprintAvailability } = useContext(AppContext) as any;
 
   useEffect(() => {
     const asyncFunc = async () => {
@@ -137,7 +137,14 @@ const FilterableTaskTable = () => {
       setShifts(newShifts);
     }
     asyncFunc();
-  }, [shifts])
+  }, [shifts]);
+
+  useEffect(() => {
+    const asyncFunc = async () => {
+      await fetchSprintAvailability();
+    }
+    asyncFunc();
+  }, [fetchSprintAvailability]);
 
 
   const handleFilterChange = (filter: string, isChecked: boolean) => {
@@ -237,13 +244,14 @@ console.log("newShift", newShift)
   }
   const groupedTasks = shiftsLocal.map((shift) => {
     
-    console.log("sortedTasks", sortedTasks);
+    //console.log("sortedTasks", sortedTasks);
     const tasksForShift = sortedTasks.filter(
       (task) => task.shiftId === shift.shiftId
     );
 
 
     //console.log("tasksForShift", tasksForShift);
+    //console.log("shiftsLocal", shiftsLocal);
 
     // Count tasks based on their status
     const statusCounts = tasksForShift.reduce(
@@ -258,8 +266,8 @@ console.log("newShift", newShift)
     );
 
     return {
+      shiftId: shift.shiftId,
       shiftName: shift.name,
-      velocity: 2,
       tasks: tasksForShift,
       statusCounts, // Add the status counts here
     };
@@ -338,11 +346,13 @@ console.log("newShift", newShift)
 
 
       {groupedTasks.map((group) => (
-        <div key={group.shiftName} className="task-group">
+        <div key={group.shiftId} className="task-group">
           <div className="flex items-center justify-between gap-4 p-2 border border-gray-300 rounded-md bg-white shadow-sm">
             <div className="flex items-center gap-4">
               <span className="text-s font-bold text-gray-400">{group.shiftName}</span>
-              <span className="text-s font-bold text-gray-400">Velocity: {group.velocity}</span>
+              <span className="text-s font-bold text-gray-400">
+                Availability: {availabilities.find((a: any) => a.sprintId === group.shiftId).availability}
+              </span>
             </div>
             <div className="flex items-center gap-4 ml-auto">
               <span className="text-xs font-bold text-gray-400">To do:

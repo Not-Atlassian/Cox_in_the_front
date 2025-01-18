@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, Dispatch, SetStateAction, ReactNode, useCallback } from 'react';
-import api, { deleteTicket, getTest, getTickets, getTicket, putTicketStatus, postTicket, getUsers, getUser, avalabilityUser, getShifts, postShift, getUsersInShift, postAdjustment, putTeamMemberAvailability, getShiftAdjustment, getShiftAdjustmentList, logIn } from '../lib/api';
+import api, { deleteTicket, getTest, getTickets, getTicket, putTicketStatus, postTicket, getUsers, getUser, avalabilityUser, getShifts, postShift, getUsersInShift, postAdjustment, putTeamMemberAvailability, getShiftAdjustment, getShiftAdjustmentList, logIn, getAvailabilityPerSprint } from '../lib/api';
 
 interface AppContextType {
   data: any;
@@ -29,6 +29,8 @@ interface AppContextType {
   fetchShiftAdjustmentList: (sprintId: number) => Promise<any>;
   adjustments: any[];
   setAdjustments: Dispatch<SetStateAction<any[]>>;
+  fetchSprintAvailability: (sprintId: number) => Promise<void>;
+  availabilities: any[];
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -225,6 +227,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   // ------------------- 4. Backlog -------------------
+  const [availabilities, setAvailabilities] = useState<any>([])
+
   const addShift = async (shift: any) => {
     try {
       await postShift(shift);
@@ -233,6 +237,24 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error adding shift:', error);
     }
   }
+
+  const fetchSprintAvailability = useCallback(async () => {
+    try {
+      const result = await getAvailabilityPerSprint();
+      setAvailabilities(result.data);
+      console.log("Availabilities", result.data);
+    } catch (error) {
+      console.error('Error fetching ticket:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchSprintAvailability();
+  }, [fetchSprintAvailability]);
+
+  useEffect(() => {
+    fetchSprintAvailability();
+  }, []);
   
   
 
@@ -265,7 +287,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       fetchShiftAdjustment,
       fetchShiftAdjustmentList,
       adjustments,
-      setAdjustments
+      setAdjustments,
+      availabilities,
+      fetchSprintAvailability,
     }}>
       {children}
     </AppContext.Provider>

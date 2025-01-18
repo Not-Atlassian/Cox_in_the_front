@@ -194,6 +194,16 @@ export const postShift = async (data: any) => {
   }
 }
 
+export const getAvailabilityPerSprint = async () => {
+  try {
+    const response = await api.get(`/api/Backlog/availability`);
+    return response;
+  } catch (error) {
+    console.error('Error retreiving availability:', error);
+    throw error;
+  }
+}
+
 
 
 export default api;
