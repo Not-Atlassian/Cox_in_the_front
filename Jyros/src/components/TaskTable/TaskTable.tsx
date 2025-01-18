@@ -74,7 +74,7 @@ const FilterableTaskTable = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
 
-  const { tickets, fetchTickets, shifts, fetchShifts, addTicket, addShift } = useContext(AppContext) as any;
+  const { tickets, fetchTickets, shifts, fetchShifts, addTicket, addShift, fetchUser } = useContext(AppContext) as any;
 
   useEffect(() => {
     const asyncFunc = async () => {
@@ -491,6 +491,7 @@ const FilterableTaskTable = () => {
                       <ChevronDownCircle />
                     </div>
                     <img className="user-logo" src="src/assets/user_logo.png"></img>
+                    <UserCard hoverName={fetchUser(task.created_by).userName} />
                   </TableCell>
                 </TableRow>
               ))}
