@@ -21,7 +21,7 @@ export function SignUpForm({ isLogin, onSubmit, onToggle }: SignUpProps) {
 
     if (isLogin) {
       try {
-        onSubmit(username, password);
+        await onSubmit(username, password);
         // LogIn(username, password);
       } catch (error) {
         console.log(error);
@@ -30,7 +30,7 @@ export function SignUpForm({ isLogin, onSubmit, onToggle }: SignUpProps) {
       if (password === confirmPassword) {
         try {
           await SignIn(username, password);
-          onSubmit(username, password);
+          await onSubmit(username, password);
           isLogin = true;
           window.location.reload();
         } catch (error) {
