@@ -12,7 +12,9 @@ const EstimationPopup = ({ title, description, handleExit, setStoryPlates }: {
 }) => {
 
     const [displayedText, setDisplayedText] = useState("Thinking...");
+    const [isTyping, setIsTyping] = useState<boolean>(true);
     const { getEstimation, storyPoints } = useContext(AppContext) as any;
+    const [estimation, setEstimation] = useState<number>(0);
 
     const handleAccept = () => {
         if (storyPoints > 0) {
@@ -32,7 +34,6 @@ const EstimationPopup = ({ title, description, handleExit, setStoryPlates }: {
             if (title === "") {
                 displayMessage = "Unfortunately, story point estimation could not be performed on a ticket with no title.";
             }
-            
             else {
                 await getEstimation(title, description);
                 if (storyPoints > 13) {
@@ -55,13 +56,30 @@ const EstimationPopup = ({ title, description, handleExit, setStoryPlates }: {
                     }
                 }
             }
-            if (storyPoints > 0 || title === "") {
-                setDisplayedText(displayMessage);
+
+            console.log("displayMessage", displayMessage);
+            console.log("estimation", estimation);
+            console.log("storyPoints", storyPoints);
+            console.log("storyPoints !== estimation", storyPoints !== estimation);
+            if (storyPoints > 0 && storyPoints !== estimation || title === "") {
+                setEstimation(storyPoints);
+                let index = 0;
+                const typingInterval = setInterval(() => {
+                    if (index < displayMessage.length + 1) {
+                        setDisplayedText(displayMessage.slice(0, index));
+                        index++;
+                    } else {
+                        clearInterval(typingInterval);
+                        setIsTyping(false);
+                    }
+                }, 30);
+
+                return () => clearInterval(typingInterval);   
             }
         }
 
         asyncfunc();
-    }, [title, description, storyPoints]);
+    }, [storyPoints]);
 
     return (
         <div className="estimation-popup">
@@ -70,11 +88,12 @@ const EstimationPopup = ({ title, description, handleExit, setStoryPlates }: {
             </div>
             <div className="message-container">
                 <p className="message">{displayedText}</p>
+                {isTyping && <span className="typing-indicator">▋</span>}
             </div>
             <div className="button-container">
                 {
                     storyPoints > 0 && storyPoints <= 13 &&
-                    <Button onClick={handleAccept}>Accept</Button>
+                    <Button onClick={handleAccept} disabled={isTyping}>Accept</Button>
                 }
                 <Button variant="outline" onClick={handleExit}>Cancel</Button>
             </div>
