@@ -172,6 +172,18 @@ export const getShiftAdjustmentList = async (sprintID: number) => {
   }
 }
 
+// --------------------------- Backlog ---------------------------
+
+export const postShift = async (data: any) => {
+  try {
+    const response = await api.post('/api/Backlog/shift', data);
+    return response;
+  } catch (error) {
+    console.error('Error posting test data:', error);
+    throw error;
+  }
+}
+
 
 
 export default api;

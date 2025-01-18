@@ -8,6 +8,9 @@ import { Utensils, UtensilsCrossed } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
 
+import TeamMates from '../TeamMates/TeamMates'
+import TicketCreate from '@/ticketPopup/TicketCreate'
+
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -73,6 +76,8 @@ const FilterableTaskTable = () => {
   // const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set()) // Track selected tasks
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  
+  const [viewOpen, setViewOpen] = useState<boolean>(false);
 
   const { tickets, fetchTickets, shifts, fetchShifts, addTicket, addShift } = useContext(AppContext) as any;
 
@@ -145,15 +150,14 @@ const FilterableTaskTable = () => {
       name: { value: string };
       startDate: { value: string };
       endDate: { value: string };
-      goal: { value: string };
+      description: { value: string };
     };
     event.preventDefault();
     const newShift = {
-      shiftId: shifts.length + 1,
       name: target.name.value,
       startDate: target.startDate.value,
       endDate: target.endDate.value,
-      goal: target.goal.value,
+      goal: target.description.value,
     };
 
     addShift(newShift);
@@ -232,14 +236,7 @@ const FilterableTaskTable = () => {
     
     console.log("sortedTasks", sortedTasks);
     const tasksForShift = sortedTasks.filter(
-      (task) => 
-        // console.log("eq", task.shiftId === shift.shiftId);
-        task.shiftId === shift.shiftId
-        // console.log(typeof task.shiftId);
-        // console.log(typeof shift.shiftId);
-        // console.log("task.shiftId", task.shiftId);
-        // console.log("shift.shiftId", shift.shiftId);
-      
+      (task) => task.shiftId === shift.shiftId
     );
 
 
@@ -257,9 +254,10 @@ const FilterableTaskTable = () => {
       { toDo: 0, cooking: 0, inPlating: 0, bonAppetit: 0 }
     );
 
+    console.log("shift title", shift.title)
     return {
-      shiftName: shift.title,
-      velocity: 1,
+      shiftName: shift.name,
+      velocity: 2,
       tasks: tasksForShift,
       statusCounts, // Add the status counts here
     };
@@ -292,9 +290,9 @@ const FilterableTaskTable = () => {
       status: { value: string };
     };
     const newTask = {
-      taskId: tasksLocal.length + 1,
+      storyId: tasksLocal.length + 1,
       title: target.title.value,
-      shiftId: parseInt(target.shift.value),
+      sprintId: parseInt(target.shift.value),
       priority: parseInt(target.priority.value),
       status: target.status.value,
     };
@@ -307,6 +305,7 @@ const FilterableTaskTable = () => {
       {/* Search Bar */}
       <div className="search-dropdown-div">
         <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+        
         <div className='dropdown-div'>
           <DropdownMenu onOpenChange={setIsOpen}>
             <DropdownMenuTrigger asChild>
@@ -327,92 +326,10 @@ const FilterableTaskTable = () => {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button
-            className='bg-white-500 hover:bg-gray-300 text-gray ml-10'
-            onClick={() => setIsTaskModalOpen(true)}
-          >
-            <PlusCircleIcon size={18} />
-            Add Task
-          </Button>
-          {isTaskModalOpen && (
-            <div className="modal-overlay">
-              <div className="modal-content">
-                <h2 className="text-xl font-bold mb-4">Create New Task</h2>
-                <form onSubmit={handleCreateTask} className="space-y-4">
-                  <div className="form-group">
-                    <label htmlFor="title" className="block font-medium mb-1">Task Title</label>
-                    <input
-                      id="title"
-                      name="title"
-                      className="input-field w-full p-2 border border-gray-300 rounded-md"
-                      placeholder="Enter task name"
-                      required
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="shift" className="block font-medium mb-1">Shift Name</label>
-                    <select
-                      id="shiftName"
-                      name="shift"
-                      className="input-field w-full p-2 border border-gray-300 rounded-md"
-                      required
-                    >
-                      <option value="" disabled selected>Select a shift</option>
-                      {shifts.map((shift, index) => (
-                        <option key={index} value={shift.taskId}>
-                          {shift.taskId}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="priority" className="block font-medium mb-1">Priority</label>
-                    <select
-                      id="priority"
-                      name="priority"
-                      className="input-field w-full p-2 border border-gray-300 rounded-md"
-                      required
-                    >
-                      <option value="" disabled selected>Select priority</option>
-                      <option value="1">1</option>
-                      <option value="2">2</option>
-                      <option value="3">3</option>
-                    </select>
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="status" className="block font-medium mb-1">Status</label>
-                    <select
-                      id="status"
-                      name="status"
-                      className="input-field w-full p-2 border border-gray-300 rounded-md"
-                      required
-                    >
-                      <option value="" disabled selected>Select priority</option>
-                      <option value="To Do">To Do</option>
-                      <option value="Cooking">Cooking</option>
-                      <option value="In Plating">In Plating</option>
-                      <option value="Bon appétit">Bon appétit</option>
-
-                    </select>
-                  </div>
-                  <div className="form-actions flex items-center justify-end space-x-4">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setIsTaskModalOpen(false)}
-                      className="bg-gray-200 hover:bg-gray-300 text-gray-800"
-                    >
-                      Cancel
-                    </Button>
-                    <Button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white">
-                      Create
-                    </Button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          )}
-
+        </div>
+          
+        <div className="bg-white-500 text-gray flex items-center justify-between">
+          <TicketCreate />
         </div>
       </div>
 
