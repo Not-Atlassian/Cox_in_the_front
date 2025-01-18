@@ -1,15 +1,19 @@
 import { createContext, useState, useEffect, Dispatch, SetStateAction, ReactNode, useCallback } from 'react';
-import { deleteTicket, getTest, getTickets, getTicket, putTicketStatus, postTicket, getUsers, getUser, avalabilityUser, getShifts, getUsersInShift, postAdjustment, putTeamMemberAvailability, getShiftAdjustment, getShiftAdjustmentList, logIn, getTeamMates } from '../lib/api';
+
+import api, { getTicketEstimation, deleteTicket, getTest, getTickets, getTicket, putTicketStatus, postTicket, getUsers, getUser, avalabilityUser, getShifts, postShift, getUsersInShift, postAdjustment, putTeamMemberAvailability, getShiftAdjustment, getShiftAdjustmentList, logIn, getTeamMates } from '../lib/api';
+
 
 interface AppContextType {
   data: any;
   setData: Dispatch<SetStateAction<any>>;
   tickets: any[];
   ticket: any;
+  storyPoints: number;
   fetchTickets: () => Promise<void>;
   addTicket: (ticket: any) => Promise<void>;
   updateTicketStatus: (ticketId: number, status: string) => Promise<void>;
   removeTicket: (ticketId: number) => Promise<void>;
+  getEstimation: (title: string, description: string) => Promise<void>;
   fetchTicket: (ticketId: number) => Promise<void>;
   users: any[];
   user: any;
@@ -19,6 +23,7 @@ interface AppContextType {
   fetchUserAvailability: (userId: number, sprintId: number) => Promise<void>;
   shifts: any[];
   fetchShifts: () => Promise<void>;
+  addShift: (shift: any) => Promise<void>;
   usersInShift: any[];
   fetchUsersInShift: (sprintId: number) => Promise<void>;
   addAdjustment: (sprintId: number, adjustment: any) => void;
@@ -32,6 +37,7 @@ interface AppContextType {
   setTeamMates: Dispatch<SetStateAction<any[]>>;
   fetchTeamMates: (teamID: number) => Promise<any>;
   LogIn:(userName: string, Password: string) => Promise<any>;
+  
   }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -43,6 +49,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [data, setData] = useState<any>(null);
   const [tickets, setTickets] = useState<any[]>([]);
   const [ticket, setTicket] = useState<any>(null);
+  const [storyPoints, setStoryPoints] = useState<number>(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -108,6 +115,16 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       await fetchTickets();
     } catch (error) {
       console.error('Error deleting ticket:', error);
+    }
+  }
+
+  const getEstimation = async (title: string, description: string) => {
+    try {
+      const response = await getTicketEstimation(title, description);
+      const data = await response.data;
+      setStoryPoints(data);
+    } catch (error) {
+      console.error('Error fetching ticket estimation:', error);
     }
   }
 
@@ -235,7 +252,17 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-
+  // ------------------- 4. Backlog -------------------
+  const addShift = async (shift: any) => {
+    try {
+      await postShift(shift);
+      await fetchTickets();
+    } catch (error) {
+      console.error('Error adding ticket:', error);
+    }
+  }
+  
+  
 
 
   return (
@@ -246,8 +273,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       fetchTickets,
       updateTicketStatus,
       removeTicket,
+      getEstimation,
       fetchTicket,
       ticket,
+      storyPoints,
       addTicket,
       users,
       fetchUsers,
@@ -257,6 +286,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       fetchUserAvailability,
       shifts,
       fetchShifts,
+      addShift,
       usersInShift,
       fetchUsersInShift,
       addAdjustment,

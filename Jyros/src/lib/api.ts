@@ -75,6 +75,18 @@ export const deleteTicket = async (ticketId: number) => {
 }
 
 
+export const getTicketEstimation = async (title: string, description: string) => {
+  try {
+    const response = await api.get(`/api/Ticket/EstimateStoryPoints?title=${title}&description=${description}`); // Replace '/api/Ticket' with your actual endpoint
+    return response;
+  }
+  catch (error) {
+    console.error('Error fetching ticket data:', error);
+    throw error;
+  }
+}
+
+
 // --------------------------- User API ---------------------------
 
 export const getUsers = async () => {
@@ -189,6 +201,18 @@ export const getTeamMates = async (teamId: number) => {
       throw error;
     }
   }
+
+// --------------------------- Backlog ---------------------------
+
+export const postShift = async (data: any) => {
+  try {
+    const response = await api.post('/api/Backlog/shift', data);
+    return response;
+  } catch (error) {
+    console.error('Error posting test data:', error);
+    throw error;
+  }
+}
 
 
 

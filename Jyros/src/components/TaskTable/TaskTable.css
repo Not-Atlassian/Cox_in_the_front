@@ -103,9 +103,11 @@
   margin-top: 100px;
 }
 
-.dropdown-div{  
-  margin-top: 10px;
-  margin-left: 50px;
+.dropdown-div{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2rem;
 }
 
 /* General Button Styling */
