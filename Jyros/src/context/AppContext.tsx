@@ -29,11 +29,18 @@ interface AppContextType {
   fetchShiftAdjustmentList: (sprintId: number) => Promise<any>;
   adjustments: any[];
   setAdjustments: Dispatch<SetStateAction<any[]>>;
+  isAuthenticated: boolean;
+  login: () => void;
+  logout: () => void;
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const login = () => setIsAuthenticated(true);
+  const logout = () => setIsAuthenticated(false);
 
   //------------------- 1. Tiket API -------------------
 
@@ -265,7 +272,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       fetchShiftAdjustment,
       fetchShiftAdjustmentList,
       adjustments,
-      setAdjustments
+      setAdjustments,
+      isAuthenticated,
+      login,
+      logout
     }}>
       {children}
     </AppContext.Provider>

@@ -245,9 +245,9 @@ const FilterableTaskTable = () => {
     // Count tasks based on their status
     const statusCounts = tasksForShift.reduce(
       (counts, task) => {
-        if (task.status === 'To do') counts.toDo++;
+        if (task.status === 'To Do') counts.toDo++;
         if (task.status === 'Cooking') counts.cooking++;
-        if (task.status === 'In plating') counts.inPlating++;
+        if (task.status === 'In Plating') counts.inPlating++;
         if (task.status === 'Bon appétit') counts.bonAppetit++;
         return counts;
       },
