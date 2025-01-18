@@ -228,9 +228,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const addShift = async (shift: any) => {
     try {
       await postShift(shift);
-      await fetchTickets();
+      await fetchShifts();
     } catch (error) {
-      console.error('Error adding ticket:', error);
+      console.error('Error adding shift:', error);
     }
   }
   

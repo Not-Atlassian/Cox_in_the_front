@@ -147,19 +147,22 @@ const FilterableTaskTable = () => {
   const handleCreateShift = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const target = event.target as typeof event.target & {
-      name: { value: string };
+      title: { value: string };
       startDate: { value: string };
       endDate: { value: string };
       description: { value: string };
     };
     event.preventDefault();
     const newShift = {
-      name: target.name.value,
+      name: target.title.value,
       startDate: target.startDate.value,
       endDate: target.endDate.value,
       goal: target.description.value,
+      sprintId: 0,
+      status: "Active",
+      teamId: 1
     };
-
+console.log("newShift", newShift)
     addShift(newShift);
     setIsModalOpen(false);
   };
@@ -240,7 +243,7 @@ const FilterableTaskTable = () => {
     );
 
 
-    console.log("tasksForShift", tasksForShift);
+    //console.log("tasksForShift", tasksForShift);
 
     // Count tasks based on their status
     const statusCounts = tasksForShift.reduce(
@@ -254,7 +257,6 @@ const FilterableTaskTable = () => {
       { toDo: 0, cooking: 0, inPlating: 0, bonAppetit: 0 }
     );
 
-    console.log("shift title", shift.title)
     return {
       shiftName: shift.name,
       velocity: 2,
@@ -301,7 +303,7 @@ const FilterableTaskTable = () => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 mb-20">
       {/* Search Bar */}
       <div className="search-dropdown-div">
         <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
