@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect, Dispatch, SetStateAction, ReactNode, useCallback } from 'react';
 
-import api, { getTicketEstimation, deleteTicket, getTest, getTickets, getTicket, putTicketStatus, postTicket, getUsers, getUser, avalabilityUser, getShifts, postShift, getUsersInShift, postAdjustment, putTeamMemberAvailability, getShiftAdjustment, getShiftAdjustmentList, logIn, getTeamMates, signIn } from '../lib/api';
+import api, { getTicketEstimation, deleteTicket, getTest, getTickets, getTicket, putTicketStatus, postTicket, getUsers, getUser, avalabilityUser, getShifts, postShift, getUsersInShift, postAdjustment, putTeamMemberAvailability, getShiftAdjustment, getShiftAdjustmentList, getAvailabilityPerSprint, logIn, getTeamMates, signIn } from '../lib/api';
 
 interface AppContextType {
   data: any;
@@ -38,6 +38,8 @@ interface AppContextType {
   LogIn:(userName: string, Password: string) => Promise<any>;
   isAuthenticated: boolean;
   SignIn: (username: string, password: string) => Promise<void>;
+  fetchSprintAvailability: (sprintId: number) => Promise<void>;
+  availabilities: any[];
 }
 
 
@@ -267,14 +269,34 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   // ------------------- 4. Backlog -------------------
+  const [availabilities, setAvailabilities] = useState<any>([])
+
   const addShift = async (shift: any) => {
     try {
       await postShift(shift);
-      await fetchTickets();
+      await fetchShifts();
     } catch (error) {
-      console.error('Error adding ticket:', error);
+      console.error('Error adding shift:', error);
     }
   }
+
+  const fetchSprintAvailability = useCallback(async () => {
+    try {
+      const result = await getAvailabilityPerSprint();
+      setAvailabilities(result.data);
+      console.log("Availabilities", result.data);
+    } catch (error) {
+      console.error('Error fetching ticket:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchSprintAvailability();
+  }, [fetchSprintAvailability]);
+
+  useEffect(() => {
+    fetchSprintAvailability();
+  }, []);
   
 
   
@@ -317,7 +339,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       setTeamMates,
       isAuthenticated,
       LogIn,
-      SignIn
+      SignIn,
+      availabilities,
+      fetchSprintAvailability,
     }}>
       {children}
     </AppContext.Provider>

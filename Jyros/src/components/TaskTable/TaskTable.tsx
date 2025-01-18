@@ -83,8 +83,7 @@ const FilterableTaskTable = () => {
   
   const [viewOpen, setViewOpen] = useState<boolean>(false);
 
-
-  const { tickets, fetchTickets, shifts, fetchShifts, addTicket, addShift, fetchUser, users, fetchUsers } = useContext(AppContext) as any;
+  const { tickets, fetchTickets, shifts, fetchShifts, addTicket, addShift, fetchUser, users, fetchUsers, availabilities, fetchSprintAvailability } = useContext(AppContext) as any;
 
   useEffect(() => {
     const asyncFunc = async () => {
@@ -138,7 +137,14 @@ const FilterableTaskTable = () => {
       setShifts(newShifts);
     }
     asyncFunc();
-  }, [shifts])
+  }, [shifts]);
+
+  useEffect(() => {
+    const asyncFunc = async () => {
+      await fetchSprintAvailability();
+    }
+    asyncFunc();
+  }, [fetchSprintAvailability]);
 
   useEffect(() => {
     const asyncFunc = async () => {
@@ -174,19 +180,22 @@ const FilterableTaskTable = () => {
   const handleCreateShift = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const target = event.target as typeof event.target & {
-      name: { value: string };
+      title: { value: string };
       startDate: { value: string };
       endDate: { value: string };
       description: { value: string };
     };
     event.preventDefault();
     const newShift = {
-      name: target.name.value,
+      name: target.title.value,
       startDate: target.startDate.value,
       endDate: target.endDate.value,
       goal: target.description.value,
+      sprintId: 0,
+      status: "Active",
+      teamId: 1
     };
-
+console.log("newShift", newShift)
     addShift(newShift);
     setIsModalOpen(false);
   };
@@ -262,7 +271,7 @@ const FilterableTaskTable = () => {
   }
   const groupedTasks = shiftsLocal.map((shift) => {
     
-    console.log("sortedTasks", sortedTasks);
+    //console.log("sortedTasks", sortedTasks);
     const tasksForShift = sortedTasks.filter(
       (task) => 
         task.shiftId === shift.shiftId
@@ -271,7 +280,8 @@ const FilterableTaskTable = () => {
     );
 
 
-    console.log("tasksForShift", tasksForShift);
+    //console.log("tasksForShift", tasksForShift);
+    //console.log("shiftsLocal", shiftsLocal);
 
     // Count tasks based on their status
     const statusCounts = tasksForShift.reduce(
@@ -285,10 +295,9 @@ const FilterableTaskTable = () => {
       { toDo: 0, cooking: 0, inPlating: 0, bonAppetit: 0 }
     );
 
-    console.log("shift title", shift.title)
     return {
+      shiftId: shift.shiftId,
       shiftName: shift.name,
-      velocity: 2,
       tasks: tasksForShift,
       statusCounts, // Add the status counts here
     };
@@ -332,7 +341,7 @@ const FilterableTaskTable = () => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 mb-20">
       {/* Search Bar */}
       <div className="search-dropdown-div">
         <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
@@ -367,11 +376,13 @@ const FilterableTaskTable = () => {
 
 
       {groupedTasks.map((group) => (
-        <div key={group.shiftName} className="task-group">
+        <div key={group.shiftId} className="task-group">
           <div className="flex items-center justify-between gap-4 p-2 border border-gray-300 rounded-md bg-white shadow-sm">
             <div className="flex items-center gap-4">
               <span className="text-s font-bold text-gray-400">{group.shiftName}</span>
-              <span className="text-s font-bold text-gray-400">Velocity: {group.velocity}</span>
+              <span className="text-s font-bold text-gray-400">
+                Availability: {availabilities.find((a: any) => a.sprintId === group.shiftId).availability}
+              </span>
             </div>
             <div className="flex items-center gap-4 ml-auto">
               <span className="text-xs font-bold text-gray-400">To do:
