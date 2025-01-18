@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, Dispatch, SetStateAction, ReactNode, useCallback } from 'react';
-import api, { deleteTicket, getTest, getTickets, getTicket, putTicketStatus, postTicket, getUsers, getUser, avalabilityUser, getShifts, postShift, getUsersInShift, postAdjustment, putTeamMemberAvailability, getShiftAdjustment, getShiftAdjustmentList, logIn } from '../lib/api';
+import api, { deleteTicket, getTest, getTickets, getTicket, putTicketStatus, postTicket, getUsers, getUser, avalabilityUser, getShifts, postShift, getUsersInShift, postAdjustment, putTeamMemberAvailability, getShiftAdjustment, getShiftAdjustmentList, logIn, getTeamMates } from '../lib/api';
 
 interface AppContextType {
   data: any;
@@ -33,6 +33,7 @@ interface AppContextType {
   setTeamMates: Dispatch<SetStateAction<any[]>>;
   fetchTeamMates: (teamID: number) => Promise<any>;
   LogIn:(userName: string, Password: string) => Promise<any>;
+  
   }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
