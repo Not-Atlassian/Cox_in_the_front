@@ -1,15 +1,17 @@
 import { createContext, useState, useEffect, Dispatch, SetStateAction, ReactNode, useCallback } from 'react';
-import { deleteTicket, getTest, getTickets, getTicket, putTicketStatus, postTicket, getUsers, getUser,avalabilityUser, getShifts, getUsersInShift, postAdjustment, putTeamMemberAvailability, getShiftAdjustment, getShiftAdjustmentList } from '../lib/api';
+import { getTicketEstimation, deleteTicket, getTest, getTickets, getTicket, putTicketStatus, postTicket, getUsers, getUser,avalabilityUser, getShifts, getUsersInShift, postAdjustment, putTeamMemberAvailability, getShiftAdjustment, getShiftAdjustmentList } from '../lib/api';
 
 interface AppContextType {
   data: any;
   setData: Dispatch<SetStateAction<any>>;
   tickets: any[];
   ticket: any;
+  storyPoints: number;
   fetchTickets: () => Promise<void>;
   addTicket: (ticket: any) => Promise<void>;
   updateTicketStatus: (ticketId: number, status: string) => Promise<void>;
   removeTicket: (ticketId: number) => Promise<void>;
+  getEstimation: (title: string, description: string) => Promise<void>;
   fetchTicket: (ticketId: number) => Promise<void>;
   users: any[];
   user: any;
@@ -39,6 +41,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [data, setData] = useState<any>(null);
   const [tickets, setTickets] = useState<any[]>([]);
   const [ticket, setTicket] = useState<any>(null);
+  const [storyPoints, setStoryPoints] = useState<number>(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -105,6 +108,16 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       await fetchTickets();
     } catch (error) {
       console.error('Error deleting ticket:', error);
+    }
+  }
+
+  const getEstimation = async (title: string, description: string) => {
+    try {
+      const response = await getTicketEstimation(title, description);
+      const data = await response.data;
+      setStoryPoints(data);
+    } catch (error) {
+      console.error('Error fetching ticket estimation:', error);
     }
   }
 
@@ -225,8 +238,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       fetchTickets,
       updateTicketStatus,
       removeTicket,
+      getEstimation,
       fetchTicket,
       ticket,
+      storyPoints,
       addTicket,
       users,
       fetchUsers,
