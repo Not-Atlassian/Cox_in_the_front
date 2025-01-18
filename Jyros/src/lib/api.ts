@@ -92,7 +92,6 @@ export const getTicketEstimation = async (title: string, description: string) =>
 export const getUsers = async () => {
   try {
     const response = await api.get('/api/User');
-    console.log("Users", response);
     return response;
   } catch (error) {
     console.error('Error fetching user data:', error);
@@ -146,7 +145,6 @@ export const getTeamMates = async (teamId: number) => {
   export const getShifts = async () => {
     try {
       const response = await api.get('/api/ShiftAvailability/sprints');
-      console.log("Shifts", response);
       return response;
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -187,7 +185,6 @@ export const getTeamMates = async (teamId: number) => {
   export const getShiftAdjustment = async (sprintId: number) => {
     try {
       const response = await api.get(`/api/ShiftAvailability/${sprintId}/adjustment`);
-      console.log("Shifts", response);
       return response;
     } catch (error) {
       console.error('Error fetching user data:', error);

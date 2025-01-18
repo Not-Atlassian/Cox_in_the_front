@@ -76,7 +76,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const fetchTickets = useCallback(async () => {
     try {
       const result = await getTickets();
-      console.log('Fetched tickets:', result.data); // Debug log
       setTickets(result.data);
     } catch (error) {
       console.error('Error fetching tickets:', error);
@@ -139,7 +138,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const fetchUsers = useCallback(async () => {
     try {
       const result = await getUsers();
-      console.log('Fetched users:', result.data); // Debug log
       setUsers(result.data);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -176,7 +174,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     try{
       const result = await getTeamMates(teamID);
       setTeamMates(result.data);
-      console.log('Fetched TeamMates COntext ---------------------------------------:', result.data);
 
     }catch{
       console.error('Error');
@@ -203,7 +200,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     try {
       const result = await getShifts();
       setShifts(result.data);
-      console.log('Fetched shifts:', result.data); // Debug log
     } catch (error) {
       console.error('Error fetching shifts:', error);
     }
