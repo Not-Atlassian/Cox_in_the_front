@@ -218,6 +218,19 @@
 input, select, textarea{
   background-color: rgb(228, 224, 224); /* Set background to white */
   color: black; /* Set text color to black */
-  border: 1px solid #ccc; /* Optional: Add a visible border */
   padding: 0.5rem; /* Add padding for better appearance */
+}
+
+input, textarea {
+  border: 1px solid #ccc; /* Optional: Add a visible border */
+}
+
+.select-task {
+  background-color: transparent;
+  /*height: fit-content;*/
+  height: 20px;
+}
+
+.select-task:focus {
+  outline: none;
 }

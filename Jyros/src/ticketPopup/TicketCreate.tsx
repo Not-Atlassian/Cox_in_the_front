@@ -76,7 +76,7 @@ export default function Component() {
         return "bg-[#F7FFA6] text-black"
       case "In Plating":
         return "bg-[#FFB992] text-black"
-      case "Bonne appétit":
+      case "Bon appétit":
         return "bg-[#FF8E8E] text-black"
       case "To Do":
       default:
@@ -243,7 +243,7 @@ export default function Component() {
                     <SelectItem value="To Do">To Do</SelectItem>
                     <SelectItem value="Cooking">Cooking</SelectItem>
                     <SelectItem value="In Plating">In Plating</SelectItem>
-                    <SelectItem value="Bonne appétit">Bonne appétit</SelectItem>
+                    <SelectItem value="Bon appétit">Bon appétit</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

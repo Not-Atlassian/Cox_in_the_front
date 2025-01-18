@@ -14,6 +14,7 @@ import TicketCreate from '@/ticketPopup/TicketCreate'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
+  DropdownMenuItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
@@ -23,6 +24,7 @@ import { Badge } from '../ui/badge'
 import UserCard from '../Shared/UserCard/UserCard'
 import { AppContext } from '@/context/AppContext'
 import { Password } from '@mynaui/icons-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 
 const ForkIcon = () => (
   <svg
@@ -80,10 +82,10 @@ const FilterableTaskTable = () => {
 
   const [localUsers, setLocalUsers] = useState([]);
 
-  
+
   const [viewOpen, setViewOpen] = useState<boolean>(false);
 
-  const { tickets, fetchTickets, shifts, fetchShifts, addTicket, addShift, fetchUser, users, fetchUsers, availabilities, fetchSprintAvailability } = useContext(AppContext) as any;
+  const { tickets, fetchTickets, shifts, fetchShifts, addTicket, addShift, fetchUser, users, fetchUsers, availabilities, fetchSprintAvailability, updateTicketStatus } = useContext(AppContext) as any;
 
   useEffect(() => {
     const asyncFunc = async () => {
@@ -122,7 +124,7 @@ const FilterableTaskTable = () => {
 
   useEffect(() => {
     const asyncFunc = async () => {
-      if(!shifts || shifts.length === 0) {
+      if (!shifts || shifts.length === 0) {
         console.error('No shifts available');
         return;
       }
@@ -165,7 +167,7 @@ const FilterableTaskTable = () => {
       const newUsers = users.map((user: any) => ({
         id: user.userId,
         name: user.username,
-        Password : user.password,
+        Password: user.password,
       }));
       setLocalUsers(newUsers);
     }
@@ -195,7 +197,7 @@ const FilterableTaskTable = () => {
       status: "Active",
       teamId: 1
     };
-console.log("newShift", newShift)
+    console.log("newShift", newShift)
     addShift(newShift);
     setIsModalOpen(false);
   };
@@ -270,12 +272,12 @@ console.log("newShift", newShift)
     })
   }
   const groupedTasks = shiftsLocal.map((shift) => {
-    
+
     //console.log("sortedTasks", sortedTasks);
     const tasksForShift = sortedTasks.filter(
-      (task) => 
+      (task) =>
         task.shiftId === shift.shiftId
-      
+
 
     );
 
@@ -340,12 +342,17 @@ console.log("newShift", newShift)
     setIsTaskModalOpen(false);
   }
 
+  const handleStatusChange = (taskId: number, newStatus: string) => {
+    console.log("taskId --------------", taskId);
+    updateTicketStatus(taskId, newStatus);
+  }
+
   return (
     <div className="space-y-4 mb-20">
       {/* Search Bar */}
       <div className="search-dropdown-div">
         <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-        
+
         <div className='dropdown-div'>
           <DropdownMenu onOpenChange={setIsOpen}>
             <DropdownMenuTrigger asChild>
@@ -367,7 +374,7 @@ console.log("newShift", newShift)
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-          
+
         <div className="bg-white-500 text-gray flex items-center justify-between">
           <TicketCreate />
         </div>
@@ -413,7 +420,7 @@ console.log("newShift", newShift)
                     className="custom-checkbox"
                     color='grey'
                   /> */}
-                Task
+                  Task
                 </TableHead>
                 <TableHead onClick={() => handleSort('title')} className="cursor-pointer w-[150px]">
                   Title <ArrowUpDown className='inline h-4 w-4' />
@@ -445,10 +452,40 @@ console.log("newShift", newShift)
                     <Badge variant="outline" className="bg-green-300 mr-4 w-[100px] status-div h-[30px]">
                       Parent
                     </Badge>
-                    <div className={`${getStatusClass(task.status)} status-div`}>
-                      {task.status}
-                      <ChevronDownCircle />
+
+                    <div className={`${getStatusClass(task.status)}`}>
+                      <Select value={task.status} onValueChange={(value: string) => handleStatusChange(task.taskId, value)}>
+                        <SelectTrigger className={`border-0 select-task focus:ring-0 focus:box-shadow-0`}>
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="To Do">To Do</SelectItem>
+                          <SelectItem value="Cooking">Cooking</SelectItem>
+                          <SelectItem value="In Plating">In Plating</SelectItem>
+                          <SelectItem value="Bon appétit">Bon appétit</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {/*<DropdownMenu onOpenChange={setIsOpen}>
+                        <DropdownMenuTrigger asChild>
+                          <div className={`status-div`}>
+                            {task.status}
+                            {<ChevronDownCircle />}
+                          </div>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-56">
+                          {filterList.map((status) => (
+                            <DropdownMenuItem
+                              key={status}
+                              checked={selectedFilters[filter] || false}
+                              onCheckedChange={(isChecked) => handleFilterChange(filter, isChecked)}
+                            >
+                              {filter}
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>*/}
                     </div>
+
                     {/* <img className="user-logo" src="src/assets/user_logo.png"></img> */}
                     <UserCard hoverName={users.find((user) => user.userId == task.createdBy).username} />
                   </TableCell>

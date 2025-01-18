@@ -60,14 +60,14 @@ const initcolumns: ColumnState = {
   '1': { id: '1', title: 'To Do UwU', tasks: [] },
   '2': { id: '2', title: 'Cooking UwU', tasks: [] },
   '3': { id: '3', title: 'In Plating UwU', tasks: [] },
-  '4': { id: '4', title: 'Bonne appetit UwU', tasks: [] },
+  '4': { id: '4', title: 'Bon appetit UwU', tasks: [] },
 }
 
 const status_to_state: { [key: string]: string } = {
   "To Do": "1",
   "Cooking": "2",
   "In Plating": "3",
-  "Bonne appétit": "4"
+  "Bon appétit": "4"
 }
 
 const getPriorityIcon = (priority: number) => {
