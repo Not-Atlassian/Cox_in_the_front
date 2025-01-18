@@ -14,19 +14,30 @@ export function SignUpForm({ isLogin, onSubmit, onToggle }: SignUpProps) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const {SignIn} = useContext(AppContext) as any;
+  const {SignIn, LogIn} = useContext(AppContext) as any;
 
-  const handleSubmit = (e: React.FormEvent) => {
-    if(confirmPassword == password)
-      {
-        try{
-          SignIn(username, password);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
 
-        }
-        catch (error){
+    if (isLogin) {
+      try {
+        onSubmit(username, password);
+        // LogIn(username, password);
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      if (password === confirmPassword) {
+        try {
+          await SignIn(username, password);
+          onSubmit(username, password);
+          isLogin = true;
+          window.location.reload();
+        } catch (error) {
           console.log(error);
         }
       }
+    }
   }
 
   return (

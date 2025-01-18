@@ -20,7 +20,6 @@ interface AppContextType {
   shifts: any[];
   fetchShifts: () => Promise<void>;
   addShift: (shift: any) => Promise<void>;
-  addShift: (shift: any) => Promise<void>;
   usersInShift: any[];
   fetchUsersInShift: (sprintId: number) => Promise<void>;
   addAdjustment: (sprintId: number, adjustment: any) => void;
@@ -250,15 +249,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   }
   
 
-  // ------------------- 4. Backlog -------------------
-  const addShift = async (shift: any) => {
-    try {
-      await postShift(shift);
-      await fetchTickets();
-    } catch (error) {
-      console.error('Error adding ticket:', error);
-    }
-  }
   
   
 
@@ -282,7 +272,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       fetchUserAvailability,
       shifts,
       fetchShifts,
-      addShift,
       addShift,
       usersInShift,
       fetchUsersInShift,

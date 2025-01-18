@@ -7,19 +7,21 @@ import { useNavigate } from 'react-router-dom';
 export default function LoginPage() {
 
   const [isLogin, setIsLogin] = useState(true);
-  const {LogIn} = useContext(AppContext) as any;
+  const {LogIn, SignIn} = useContext(AppContext) as any;
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate(); // Initialize navigate hook
 
   const handleSubmit = async (username: string, password: string) => {
-    try {
-      LogIn(username, password);
-      navigate('/backlog');
-    }
-    catch (error){
-      // if(error.message == "")
-      console.log(error)
-
+    if (isLogin) {
+      try {
+        await LogIn(username, password);
+        navigate('/board'); // Redirect to board page
+      } catch (error) {
+        setError(error.message);
+      }
+    }else{
+      await SignIn(username, password);
+      setIsLogin(true);
     }
   };
 
