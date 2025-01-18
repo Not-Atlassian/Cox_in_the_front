@@ -79,7 +79,7 @@ export const deleteTicket = async (ticketId: number) => {
 
 export const getUsers = async () => {
   try {
-    const response = await api.get('/api/User'); 
+    const response = await api.get('/api/User');
     console.log("Users", response);
     return response;
   } catch (error) {
@@ -90,7 +90,7 @@ export const getUsers = async () => {
 
 export const getUser = async (userId: number) => {
   try {
-    const response = await api.get(`/api/User/${userId}`); 
+    const response = await api.get(`/api/User/${userId}`);
     return response;
   } catch (error) {
     console.error('Error fetching user data:', error);
@@ -99,89 +99,100 @@ export const getUser = async (userId: number) => {
 }
 
 export const logIn = async (userName: string, Password: string) => {
-  try{
+  try {
     const response = await api.post('/login');
     return response;
-  }catch (error){
+  } catch (error) {
     console.error(error)
     throw error;
   }
 }
 
-// --------------------------- Shift Availability API ---------------------------
-
-export const avalabilityUser = async (userId: number, sprintId: number) => {
+export const getTeamMates = async (teamId: number) => {
   try {
-    const response = await api.get(`/api/ShiftAvailability/${sprintId}/${userId}`); 
+    const response = await api.get(`/Test/GetUsersInTeam/${teamId}`);
     return response;
-  } catch (error) {
-    console.error('Error fetching user data:', error);
+
+  } catch(error) {
+    console.error(error)
     throw error;
   }
 }
 
-export const getShifts = async () => {
-  try {
-    const response = await api.get('/api/ShiftAvailability/sprints'); 
-    console.log("Shifts", response);
-    return response;
-  } catch (error) {
-    console.error('Error fetching user data:', error);
-    throw error;
+  // --------------------------- Shift Availability API ---------------------------
+
+  export const avalabilityUser = async (userId: number, sprintId: number) => {
+    try {
+      const response = await api.get(`/api/ShiftAvailability/${sprintId}/${userId}`);
+      return response;
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      throw error;
+    }
   }
-}
 
-export const getUsersInShift = async (sprintId: number) => {
-  try {
-    const response = await api.get(`/api/ShiftAvailability/sprints/${sprintId}/users`); 
-    return response;
-  } catch (error) {
-    console.error('Error fetching user data:', error);
-    throw error;
+  export const getShifts = async () => {
+    try {
+      const response = await api.get('/api/ShiftAvailability/sprints');
+      console.log("Shifts", response);
+      return response;
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      throw error;
+    }
   }
-}
 
-export const postAdjustment = async (sprintId: number,  data: any) => {
-  try {
-    const response = await api.post(`/api/ShiftAvailability/${sprintId}/adjustment`, data); 
-    return response;
-  } catch (error) {
-    console.error('Error fetching user data:', error);
-    throw error;
+  export const getUsersInShift = async (sprintId: number) => {
+    try {
+      const response = await api.get(`/api/ShiftAvailability/sprints/${sprintId}/users`);
+      return response;
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      throw error;
+    }
   }
-}
 
-export const putTeamMemberAvailability = async (userId: number,sprintId: number , data: any) => {
-  try {
-    const response = await api.put(`/api/ShiftAvailability/${sprintId}/${userId}`, data); 
-    return response;
-  } catch (error) {
-    console.error('Error fetching user data:', error);
-    throw error;
+  export const postAdjustment = async (sprintId: number, data: any) => {
+    try {
+      const response = await api.post(`/api/ShiftAvailability/${sprintId}/adjustment`, data);
+      return response;
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      throw error;
+    }
   }
-}
 
-export const getShiftAdjustment = async (sprintId: number) => {
-  try {
-    const response = await api.get(`/api/ShiftAvailability/${sprintId}/adjustment`); 
-    console.log("Shifts", response);
-    return response;
-  } catch (error) {
-    console.error('Error fetching user data:', error);
-    throw error;
+  export const putTeamMemberAvailability = async (userId: number, sprintId: number, data: any) => {
+    try {
+      const response = await api.put(`/api/ShiftAvailability/${sprintId}/${userId}`, data);
+      return response;
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      throw error;
+    }
   }
-}
 
-export const getShiftAdjustmentList = async (sprintID: number) => {
-  try {
-    const response = await api.get(`/api/ShiftAvailability/${sprintID}/adjustment/all`); 
-    return response;
-  } catch (error) {
-    console.error('Error fetching user data:', error);
-    throw error;
+  export const getShiftAdjustment = async (sprintId: number) => {
+    try {
+      const response = await api.get(`/api/ShiftAvailability/${sprintId}/adjustment`);
+      console.log("Shifts", response);
+      return response;
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      throw error;
+    }
   }
-}
+
+  export const getShiftAdjustmentList = async (sprintID: number) => {
+    try {
+      const response = await api.get(`/api/ShiftAvailability/${sprintID}/adjustment/all`);
+      return response;
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      throw error;
+    }
+  }
 
 
 
-export default api;
+  export default api;

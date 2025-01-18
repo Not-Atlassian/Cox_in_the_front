@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, Dispatch, SetStateAction, ReactNode, useCallback } from 'react';
-import api, { deleteTicket, getTest, getTickets, getTicket, putTicketStatus, postTicket, getUsers, getUser, avalabilityUser, getShifts, getUsersInShift, postAdjustment, putTeamMemberAvailability, getShiftAdjustment, getShiftAdjustmentList, logIn } from '../lib/api';
+import { deleteTicket, getTest, getTickets, getTicket, putTicketStatus, postTicket, getUsers, getUser, avalabilityUser, getShifts, getUsersInShift, postAdjustment, putTeamMemberAvailability, getShiftAdjustment, getShiftAdjustmentList, logIn, getTeamMates } from '../lib/api';
 
 interface AppContextType {
   data: any;
@@ -28,7 +28,11 @@ interface AppContextType {
   fetchShiftAdjustmentList: (sprintId: number) => Promise<any>;
   adjustments: any[];
   setAdjustments: Dispatch<SetStateAction<any[]>>;
-}
+  teamMates: any[];
+  setTeamMates: Dispatch<SetStateAction<any[]>>;
+  fetchTeamMates: (teamID: number) => Promise<any>;
+  LogIn:(userName: string, Password: string) => Promise<any>;
+  }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
 
@@ -113,6 +117,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [users, setUsers] = useState<any[]>([]);
   const [user, setUser] = useState<any>(null);
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [teamMates, setTeamMates] = useState<any[]>([]);
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -149,6 +154,17 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       throw error;
     }
   };
+
+  const fetchTeamMates = useCallback(async (teamID:number) =>{
+    try{
+      const result = await getTeamMates(teamID);
+      setTeamMates(result.data);
+      console.log('Fetched TeamMates COntext ---------------------------------------:', result.data);
+
+    }catch{
+      console.error('Error');
+    }
+  }, []);
   // ------------------- 3. User Availability Api -------------------
   const [userAvailability, setUserAvailability] = useState<any>(null);
   const [shifts, setShifts] = useState<any[]>([]);
@@ -253,7 +269,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       fetchShiftAdjustment,
       fetchShiftAdjustmentList,
       adjustments,
-      setAdjustments
+      setAdjustments,
+      fetchTeamMates,
+      teamMates,
+      setTeamMates,
+      LogIn,
     }}>
       {children}
     </AppContext.Provider>
