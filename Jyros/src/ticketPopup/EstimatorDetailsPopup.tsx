@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Bar } from "react-chartjs-2";
 import {
@@ -136,8 +135,6 @@ const ModelDescription = () => {
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 const MetricsAndMatrix = () => {
-  const storyPoints = Array.from({ length: 7 }, (_, i) => `SP${i + 1}`);
-
   const accuracyImprovement = [0.35, 0.42, 0.51, 0.6, 0.63, 0.74, 0.8, 0.84, 0.841, 0.87, 0.88, 0.88, 0.89, 0.898, 0.9];
 
   const metricsData = {
