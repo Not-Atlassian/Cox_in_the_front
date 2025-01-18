@@ -26,7 +26,7 @@ const UserCard = ({ hoverName }: { hoverName?: string }) => {
       }, [id]);
       if(hoverName === undefined){
         return (<div className="user-card">
-        <img className="user-logo" id={`user-${hoverName}`} src="src/assets/user_logo.png">
+        <img className="user-logo" id={`user-${hoverName}`} src="src/assets/solid_red.png">
             
         </img>
         </div>

@@ -1,15 +1,18 @@
 import { createContext, useState, useEffect, Dispatch, SetStateAction, ReactNode, useCallback } from 'react';
-import api, { deleteTicket, getTest, getTickets, getTicket, putTicketStatus, postTicket, getUsers, getUser, avalabilityUser, getShifts, postShift, getUsersInShift, postAdjustment, putTeamMemberAvailability, getShiftAdjustment, getShiftAdjustmentList, logIn, signIn } from '../lib/api';
+
+import api, { getTicketEstimation, deleteTicket, getTest, getTickets, getTicket, putTicketStatus, postTicket, getUsers, getUser, avalabilityUser, getShifts, postShift, getUsersInShift, postAdjustment, putTeamMemberAvailability, getShiftAdjustment, getShiftAdjustmentList, logIn, getTeamMates } from '../lib/api';
 
 interface AppContextType {
   data: any;
   setData: Dispatch<SetStateAction<any>>;
   tickets: any[];
   ticket: any;
+  storyPoints: number;
   fetchTickets: () => Promise<void>;
   addTicket: (ticket: any) => Promise<void>;
   updateTicketStatus: (ticketId: number, status: string) => Promise<void>;
   removeTicket: (ticketId: number) => Promise<void>;
+  getEstimation: (title: string, description: string) => Promise<void>;
   fetchTicket: (ticketId: number) => Promise<void>;
   users: any[];
   user: any;
@@ -29,10 +32,19 @@ interface AppContextType {
   fetchShiftAdjustmentList: (sprintId: number) => Promise<any>;
   adjustments: any[];
   setAdjustments: Dispatch<SetStateAction<any[]>>;
+
+  teamMates: any[];
+  setTeamMates: Dispatch<SetStateAction<any[]>>;
+  fetchTeamMates: (teamID: number) => Promise<any>;
+  LogIn:(userName: string, Password: string) => Promise<any>;
+  
+  
+
   isAuthenticated: boolean;
   LogIn: (username: string, password: string) => Promise<void>;
   SignIn: (username: string, password: string) => Promise<void>;
 }
+
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
 
@@ -44,6 +56,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [data, setData] = useState<any>(null);
   const [tickets, setTickets] = useState<any[]>([]);
   const [ticket, setTicket] = useState<any>(null);
+  const [storyPoints, setStoryPoints] = useState<number>(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -70,7 +83,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const fetchTickets = useCallback(async () => {
     try {
       const result = await getTickets();
-      console.log('Fetched tickets:', result.data); // Debug log
       setTickets(result.data);
     } catch (error) {
       console.error('Error fetching tickets:', error);
@@ -113,16 +125,26 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
+  const getEstimation = async (title: string, description: string) => {
+    try {
+      const response = await getTicketEstimation(title, description);
+      const data = await response.data;
+      setStoryPoints(data);
+    } catch (error) {
+      console.error('Error fetching ticket estimation:', error);
+    }
+  }
+
   // ------------------- 2. User Api -------------------
 
   const [users, setUsers] = useState<any[]>([]);
   const [user, setUser] = useState<any>(null);
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [teamMates, setTeamMates] = useState<any[]>([]);
 
   const fetchUsers = useCallback(async () => {
     try {
       const result = await getUsers();
-      console.log('Fetched users:', result.data); // Debug log
       setUsers(result.data);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -156,6 +178,17 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+
+  const fetchTeamMates = useCallback(async (teamID:number) =>{
+    try{
+      const result = await getTeamMates(teamID);
+      setTeamMates(result.data);
+
+    }catch{
+      console.error('Error');
+    }
+  }, []);
+
   const SignIn = async (userName: string, Password: string) => {
     try {
       const result = await signIn(userName, Password)
@@ -163,6 +196,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       throw error;
     }
   };
+
 
   // ------------------- 3. User Availability Api -------------------
   const [userAvailability, setUserAvailability] = useState<any>(null);
@@ -185,7 +219,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     try {
       const result = await getShifts();
       setShifts(result.data);
-      console.log('Fetched shifts:', result.data); // Debug log
     } catch (error) {
       console.error('Error fetching shifts:', error);
     }
@@ -261,8 +294,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       fetchTickets,
       updateTicketStatus,
       removeTicket,
+      getEstimation,
       fetchTicket,
       ticket,
+      storyPoints,
       addTicket,
       users,
       fetchUsers,
@@ -282,10 +317,12 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       fetchShiftAdjustmentList,
       adjustments,
       setAdjustments,
+      fetchTeamMates,
+      teamMates,
+      setTeamMates,
       isAuthenticated,
       LogIn,
       SignIn
-
     }}>
       {children}
     </AppContext.Provider>

@@ -22,6 +22,7 @@ import './TaskTable.css'
 import { Badge } from '../ui/badge'
 import UserCard from '../Shared/UserCard/UserCard'
 import { AppContext } from '@/context/AppContext'
+import { Password } from '@mynaui/icons-react'
 
 const ForkIcon = () => (
   <svg
@@ -76,15 +77,18 @@ const FilterableTaskTable = () => {
   // const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set()) // Track selected tasks
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+
+  const [localUsers, setLocalUsers] = useState([]);
+
   
   const [viewOpen, setViewOpen] = useState<boolean>(false);
 
-  const { tickets, fetchTickets, shifts, fetchShifts, addTicket, addShift } = useContext(AppContext) as any;
+
+  const { tickets, fetchTickets, shifts, fetchShifts, addTicket, addShift, fetchUser, users, fetchUsers } = useContext(AppContext) as any;
 
   useEffect(() => {
     const asyncFunc = async () => {
       await fetchTickets();
-      console.log(tickets); // Log the tickets
     };
     asyncFunc();
   }, [fetchTickets]);
@@ -96,14 +100,13 @@ const FilterableTaskTable = () => {
         return;
       }
 
-      console.log("tickets", tickets);
-
       const newTasks = tickets.map((ticket: any) => ({
         taskId: ticket.storyId,
         title: ticket.title,
         priority: ticket.priority,
         status: ticket.status,
         shiftId: ticket.sprintId,
+        createdBy: ticket.createdBy,
       }));
 
       setTasks(newTasks);
@@ -114,7 +117,6 @@ const FilterableTaskTable = () => {
   useEffect(() => {
     const asyncFunc = async () => {
       await fetchShifts();
-      console.log(shifts); // Log the tickets
     };
     asyncFunc();
   }, [fetchShifts]);
@@ -126,7 +128,6 @@ const FilterableTaskTable = () => {
         return;
       }
 
-      console.log("shifts", shifts);
       const newShifts = shifts.map((shift: any) => ({
         shiftId: shift.sprintId,
         name: shift.name,
@@ -138,6 +139,32 @@ const FilterableTaskTable = () => {
     }
     asyncFunc();
   }, [shifts])
+
+  useEffect(() => {
+    const asyncFunc = async () => {
+      await fetchUsers();
+      console.log(users);
+      console.log("users----------------------------------------------------------", users);
+    };
+    asyncFunc();
+  }, [fetchUsers]);
+
+  useEffect(() => {
+    const asyncFunc = async () => {
+      if (!users || users.length === 0) {
+        console.error('No users available');
+        return;
+      }
+
+      const newUsers = users.map((user: any) => ({
+        id: user.userId,
+        name: user.username,
+        Password : user.password,
+      }));
+      setLocalUsers(newUsers);
+    }
+    asyncFunc();
+  }, [users])
 
 
   const handleFilterChange = (filter: string, isChecked: boolean) => {
@@ -194,7 +221,7 @@ const FilterableTaskTable = () => {
 
   // Sort tasks based on sortConfig
   const sortedTasks = [...searchFilteredTasks].sort((a, b) => {
-    console.log("searchFilteredTasks", searchFilteredTasks);
+    // console.log("searchFilteredTasks", searchFilteredTasks);
     if (!sortConfig) return 0;
     const { key, direction } = sortConfig;
 
@@ -220,6 +247,7 @@ const FilterableTaskTable = () => {
     }
   }
 
+
   // Handle individual task selection
   const handleTaskSelect = (task: string, isChecked: boolean) => {
     setSelectedTasks((prev) => {
@@ -236,7 +264,10 @@ const FilterableTaskTable = () => {
     
     console.log("sortedTasks", sortedTasks);
     const tasksForShift = sortedTasks.filter(
-      (task) => task.shiftId === shift.shiftId
+      (task) => 
+        task.shiftId === shift.shiftId
+      
+
     );
 
 
@@ -407,7 +438,8 @@ const FilterableTaskTable = () => {
                       {task.status}
                       <ChevronDownCircle />
                     </div>
-                    <img className="user-logo" src="src/assets/user_logo.png"></img>
+                    {/* <img className="user-logo" src="src/assets/user_logo.png"></img> */}
+                    <UserCard hoverName={users.find((user) => user.userId == task.createdBy).username} />
                   </TableCell>
                 </TableRow>
               ))}

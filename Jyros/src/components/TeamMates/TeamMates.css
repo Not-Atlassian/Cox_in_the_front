@@ -1,6 +1,8 @@
 .flex-container {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 0.1em;
-  }
+  display: flex; /* Flexbox for alignment */
+  flex-wrap: wrap; /* Allow cards to wrap to the next line */
+  gap: 1em; /* Even spacing between cards */
+  justify-content: flex-start; /* Align items to the left (or adjust as needed) */
+  align-items: center; /* Ensure items align properly */
+  flex-direction: row; /* Align items horizontally */
+}

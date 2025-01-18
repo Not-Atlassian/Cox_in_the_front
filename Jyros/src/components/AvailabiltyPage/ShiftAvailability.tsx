@@ -41,7 +41,6 @@ export default function ShiftAvailability() {
         fetchShiftAdjustment(currentShift);
         const fetchTest = async () => {
         let test = await fetchShiftAdjustmentList(currentShift);
-        console.log("Test-----------------", test);
         }
         fetchTest();
         

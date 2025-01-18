@@ -107,14 +107,12 @@ export default function Board() {
       }
 
       const stories = JSON.parse(JSON.stringify(tickets));
-      console.log(stories);
       if (!stories) {
         console.error('Failed to parse stories');
         return;
       }
 
       setStoryTickets(stories);
-      console.log("AAAAAAAAAAAAAAAAAAAAAAA", stories);
       Tasks.splice(0, Tasks.length);
       stories.forEach((story: any) => {
         Tasks.push({
