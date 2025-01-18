@@ -5,7 +5,7 @@ import { AppContext } from '@/context/AppContext';
 function PrivateRoute({ children }) {
   const { isAuthenticated } = useContext(AppContext);
 
-  return isAuthenticated ? children : <Navigate to="/login" />;
+  return isAuthenticated ? children : <Navigate to="/backlog" />;
 }
 
 export default PrivateRoute;

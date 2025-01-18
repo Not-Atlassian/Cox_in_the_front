@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { AppContext } from '@/context/AppContext'
 
 interface SignUpProps {
   isLogin: boolean
@@ -13,14 +14,19 @@ export function SignUpForm({ isLogin, onSubmit, onToggle }: SignUpProps) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const {SignIn} = useContext(AppContext) as any;
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (isLogin) {
-      onSubmit(username, password)
-    } else {
-      onSubmit(username, password, confirmPassword)
-    }
+    if(confirmPassword == password)
+      {
+        try{
+          SignIn(username, password);
+
+        }
+        catch (error){
+          console.log(error);
+        }
+      }
   }
 
   return (

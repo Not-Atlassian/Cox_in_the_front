@@ -98,9 +98,19 @@ export const getUser = async (userId: number) => {
   }
 }
 
-export const logIn = async (userName: string, Password: string) => {
+export const logIn = async (username: string, Password: string) => {
   try{
-    const response = await api.post('/login');
+    const response = await api.post('/login', {username, Password});
+    return response;
+  }catch (error){
+    console.error(error)
+    throw error;
+  }
+}
+
+export const signIn = async (username: string, Password: string) => {
+  try{
+    const response = await api.post('/api/User', {username, Password});
     return response;
   }catch (error){
     console.error(error)

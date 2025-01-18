@@ -2,27 +2,24 @@ import { useState, useContext } from 'react'
 import { SignUpForm } from '@/assets/user/SignUpPage'
 import '@/assets/user/index.css'
 import { AppContext } from '@/context/AppContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function LoginPage() {
-  const { users, setUser } = useContext(AppContext);
-  const [isLogin, setIsLogin] = useState(true)
+
+  const [isLogin, setIsLogin] = useState(true);
+  const {LogIn} = useContext(AppContext) as any;
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate(); // Initialize navigate hook
 
   const handleSubmit = async (username: string, password: string) => {
-    if (isLogin) {
-      // Verify user credentials during login
-      const user = users.find(
-        (user) => user.username === username && user.password === password
-      );
+    try {
+      LogIn(username, password);
+      navigate('/backlog');
+    }
+    catch (error){
+      // if(error.message == "")
+      console.log(error)
 
-      if (user) {
-        setUser(user);
-        console.log('Login successful:', user);
-      } else {
-        setError('Invalid username or password');
-      }
-    } else {
-      console.log('Signing up:', { username, password });
     }
   };
 
