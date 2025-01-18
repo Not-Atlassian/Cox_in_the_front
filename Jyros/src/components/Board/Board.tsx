@@ -57,13 +57,13 @@ const Tasks = [
 ]
 
 const initcolumns: ColumnState = {
-  '1': { id: '1', title: 'To Do :3', tasks: [] },
-  '2': { id: '2', title: 'Cooking :3', tasks: [] },
-  '3': { id: '3', title: 'In Plating :3', tasks: [] },
-  '4': { id: '4', title: 'Bonne appetit :3', tasks: [] },
+  '1': { id: '1', title: 'To Do UwU', tasks: [] },
+  '2': { id: '2', title: 'Cooking UwU', tasks: [] },
+  '3': { id: '3', title: 'In Plating UwU', tasks: [] },
+  '4': { id: '4', title: 'Bonne appetit UwU', tasks: [] },
 }
 
-const status_to_state: {[key: string]: string}  = {
+const status_to_state: { [key: string]: string } = {
   "To Do": "1",
   "Cooking": "2",
   "In Plating": "3",
@@ -90,7 +90,7 @@ export default function Board() {
   const [storyTickets, setStoryTickets] = useState<any>([]);
   const context = useContext(AppContext);
   const { tickets, fetchTickets, updateTicketStatus } = context as any;
-  
+
   useEffect(() => {
     const asyncFunc = async () => {
       await fetchTickets();
@@ -105,16 +105,16 @@ export default function Board() {
         console.error('No tickets available');
         return;
       }
-      
+
       const stories = JSON.parse(JSON.stringify(tickets));
       console.log(stories);
       if (!stories) {
         console.error('Failed to parse stories');
         return;
       }
-  
+
       setStoryTickets(stories);
-      console.log("AAAAAAAAAAAAAAAAAAAAAAA",stories);
+      console.log("AAAAAAAAAAAAAAAAAAAAAAA", stories);
       Tasks.splice(0, Tasks.length);
       stories.forEach((story: any) => {
         Tasks.push({
@@ -125,7 +125,7 @@ export default function Board() {
           intId: story.storyId,
         });
       });
-  
+
       const columnsCopy = { ...initcolumns };
       Object.values(columnsCopy).forEach((column) => {
         column.tasks = [];
@@ -135,7 +135,7 @@ export default function Board() {
       });
       setColumns(columnsCopy);
     };
-  
+
     asyncFunc();
   }, [tickets]);
 
@@ -177,7 +177,7 @@ export default function Board() {
         },
       });
     }
-    
+
   };
 
   return (
@@ -195,10 +195,10 @@ export default function Board() {
           </header>
           <main className="p-6">
             <div className="mb-6 flex items-center justify-between">
-              <TeamMates teamId={1}/>
+              <TeamMates teamId={1} />
               <TicketCreate />
               {
-                viewOpen ? (<TicketView id={taskId} handleClose={() => setViewOpen(false)}  />) : ""
+                viewOpen ? (<TicketView id={taskId} handleClose={() => setViewOpen(false)} />) : ""
               }
             </div>
             <DragDropContext onDragEnd={onDragEnd}>
@@ -208,14 +208,14 @@ export default function Board() {
                     {(provided) => (
                       <Card {...provided.droppableProps} ref={provided.innerRef}>
                         <CardHeader>
-                          <CardTitle>{column.title}</CardTitle>
+                          <CardTitle>{column.title} ({column.tasks.length})</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
                           {column.tasks.map((task, index) => (
                             <Draggable key={task.id} draggableId={task.id} index={index}>
                               {(provided) => (
                                 <Card
-                                  onClick={() =>{ 
+                                  onClick={() => {
                                     setTaskId(task.intId);
                                     setViewOpen(true)
                                   }}
