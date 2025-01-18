@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect, Dispatch, SetStateAction, ReactNode, useCallback } from 'react';
 
-import api, { getTicketEstimation, deleteTicket, getTest, getTickets, getTicket, putTicketStatus, postTicket, getUsers, getUser, avalabilityUser, getShifts, postShift, getUsersInShift, postAdjustment, putTeamMemberAvailability, getShiftAdjustment, getShiftAdjustmentList, logIn, getTeamMates } from '../lib/api';
+import api, { getTicketEstimation, deleteTicket, getTest, getTickets, getTicket, putTicketStatus, postTicket, getUsers, getUser, avalabilityUser, getShifts, postShift, getUsersInShift, postAdjustment, putTeamMemberAvailability, getShiftAdjustment, getShiftAdjustmentList, logIn, getTeamMates, signIn } from '../lib/api';
 
 interface AppContextType {
   data: any;
@@ -32,16 +32,11 @@ interface AppContextType {
   fetchShiftAdjustmentList: (sprintId: number) => Promise<any>;
   adjustments: any[];
   setAdjustments: Dispatch<SetStateAction<any[]>>;
-
   teamMates: any[];
   setTeamMates: Dispatch<SetStateAction<any[]>>;
   fetchTeamMates: (teamID: number) => Promise<any>;
   LogIn:(userName: string, Password: string) => Promise<any>;
-  
-  
-
   isAuthenticated: boolean;
-  LogIn: (username: string, password: string) => Promise<void>;
   SignIn: (username: string, password: string) => Promise<void>;
 }
 

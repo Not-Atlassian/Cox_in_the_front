@@ -431,7 +431,7 @@ const FilterableTaskTable = () => {
                     {task.priority === 1 ? <ForkIcon /> : task.priority === 2 ? <Utensils /> : <UtensilsCrossed />}
                   </TableCell>
                   <TableCell className='status-cell'>
-                    <Badge variant="outline" className="bg-green-300 mr-4 w-[100px]">
+                    <Badge variant="outline" className="bg-green-300 mr-4 w-[100px] status-div h-[30px]">
                       Parent
                     </Badge>
                     <div className={`${getStatusClass(task.status)} status-div`}>
