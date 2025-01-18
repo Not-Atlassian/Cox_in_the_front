@@ -2,7 +2,6 @@ import { createContext, useState, useEffect, Dispatch, SetStateAction, ReactNode
 
 import api, { getTicketEstimation, deleteTicket, getTest, getTickets, getTicket, putTicketStatus, postTicket, getUsers, getUser, avalabilityUser, getShifts, postShift, getUsersInShift, postAdjustment, putTeamMemberAvailability, getShiftAdjustment, getShiftAdjustmentList, logIn, getTeamMates } from '../lib/api';
 
-
 interface AppContextType {
   data: any;
   setData: Dispatch<SetStateAction<any>>;
@@ -33,16 +32,24 @@ interface AppContextType {
   fetchShiftAdjustmentList: (sprintId: number) => Promise<any>;
   adjustments: any[];
   setAdjustments: Dispatch<SetStateAction<any[]>>;
+
   teamMates: any[];
   setTeamMates: Dispatch<SetStateAction<any[]>>;
   fetchTeamMates: (teamID: number) => Promise<any>;
   LogIn:(userName: string, Password: string) => Promise<any>;
   
-  }
+  
+
+  isAuthenticated: boolean;
+  LogIn: (username: string, password: string) => Promise<void>;
+  SignIn: (username: string, password: string) => Promise<void>;
+}
+
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   //------------------- 1. Tiket API -------------------
 
@@ -165,10 +172,12 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     try {
       const result = await logIn(userName, Password)
       setCurrentUser(result.data);
+      setIsAuthenticated(true);
     } catch (error) {
       throw error;
     }
   };
+
 
   const fetchTeamMates = useCallback(async (teamID:number) =>{
     try{
@@ -179,6 +188,16 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error');
     }
   }, []);
+
+  const SignIn = async (userName: string, Password: string) => {
+    try {
+      const result = await signIn(userName, Password)
+    } catch (error) {
+      throw error;
+    }
+  };
+
+
   // ------------------- 3. User Availability Api -------------------
   const [userAvailability, setUserAvailability] = useState<any>(null);
   const [shifts, setShifts] = useState<any[]>([]);
@@ -262,6 +281,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }
   }
   
+
+  
   
 
 
@@ -299,7 +320,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       fetchTeamMates,
       teamMates,
       setTeamMates,
+      isAuthenticated,
       LogIn,
+      SignIn
     }}>
       {children}
     </AppContext.Provider>
