@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, Dispatch, SetStateAction, ReactNode, useCallback } from 'react';
-import api, { deleteTicket, getTest, getTickets, getTicket, putTicketStatus, postTicket, getUsers, getUser, avalabilityUser, getShifts, getUsersInShift, postAdjustment, putTeamMemberAvailability, getShiftAdjustment, getShiftAdjustmentList, logIn } from '../lib/api';
+import api, { deleteTicket, getTest, getTickets, getTicket, putTicketStatus, postTicket, getUsers, getUser, avalabilityUser, getShifts, postShift, getUsersInShift, postAdjustment, putTeamMemberAvailability, getShiftAdjustment, getShiftAdjustmentList, logIn } from '../lib/api';
 
 interface AppContextType {
   data: any;
@@ -19,6 +19,7 @@ interface AppContextType {
   fetchUserAvailability: (userId: number, sprintId: number) => Promise<void>;
   shifts: any[];
   fetchShifts: () => Promise<void>;
+  addShift: (shift: any) => Promise<void>;
   usersInShift: any[];
   fetchUsersInShift: (sprintId: number) => Promise<void>;
   addAdjustment: (sprintId: number, adjustment: any) => void;
@@ -223,7 +224,17 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-
+  // ------------------- 4. Backlog -------------------
+  const addShift = async (shift: any) => {
+    try {
+      await postShift(shift);
+      await fetchTickets();
+    } catch (error) {
+      console.error('Error adding ticket:', error);
+    }
+  }
+  
+  
 
 
   return (
@@ -245,6 +256,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       fetchUserAvailability,
       shifts,
       fetchShifts,
+      addShift,
       usersInShift,
       fetchUsersInShift,
       addAdjustment,
