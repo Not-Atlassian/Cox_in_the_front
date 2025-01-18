@@ -21,10 +21,6 @@ const TeamMates = ({ teamId }: { teamId: number }) => {
             fetchTeamMates(teamId);
         }
         fetchTeamMates1(teamId);
-        console.log("TeamMates", teamMates);
-        for (let i = 0; i < teamMates.length; i++) {
-            console.log(teamMates[i].username);
-        }
     }, [teamId]);
 
     return (
