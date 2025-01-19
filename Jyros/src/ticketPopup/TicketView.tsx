@@ -8,14 +8,17 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { ChevronLeft, ChevronUp, Zap, Trash } from "lucide-react"
+import { ChevronLeft, ChevronUp, Zap, Trash, ChevronDown, HelpCircle } from "lucide-react"
 
 import { AppContext } from "@/context/AppContext"
 import { Context } from "vm"
+import EstimationPopup from "./EstimationPopup"
+import EstimatorDetailsPopup from "./EstimatorDetailsPopup"
 
 export default function TicketView({ id, handleClose }: { id: number, handleClose: () => void }) {
   const [ticketTitle, setTicketTitle] = useState("BLA BLA BLA BLA BLA BLA bla bla bla bal bal abl")
@@ -44,6 +47,9 @@ export default function TicketView({ id, handleClose }: { id: number, handleClos
 
   const [dialogPosition2, setDialogPosition2] = useState({ top: 0, left: 0 });
   const [dialogPosition3, setDialogPosition3] = useState({ top: 0, left: 0 });
+  
+  const [openEstimateDialog, setOpenEstimateDialog] = useState(false);
+  const [openHelpDialog, setOpenHelpDialog] = useState(false);
 
   useEffect(() => {
     setDialogPosition2(generateRandomPosition());
@@ -122,6 +128,10 @@ export default function TicketView({ id, handleClose }: { id: number, handleClos
   const cancelDelete3 = () => {
     setIsDeleteDialogOpen3(false);
   };
+
+  const handleExitEstimate = () => {
+    setOpenEstimateDialog(false);
+  }
 
   
 
@@ -532,14 +542,41 @@ export default function TicketView({ id, handleClose }: { id: number, handleClos
             </DialogTitle>
           </div>
           <div className="flex items-center gap-2 pt-2">
-            <Button
+            <Dialog open={openEstimateDialog} onOpenChange={setOpenEstimateDialog}>
+              <DialogTrigger asChild>
+                <Button variant="secondary" size="sm" className="bg-[#F1F3F5] hover:bg-[#E9ECEF] text-gray-700">
+                  <ChevronDown className="h-3 w-3" />
+                  <Zap className="mr-2 h-3 w-3" />
+                  <DialogTitle className="text-sm">
+                    Estimate with AI
+                  </DialogTitle>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="p-4">
+                <EstimationPopup title={ticketTitle} description={ticketDescription} handleExit={handleExitEstimate} setStoryPlates={setStoryPlates} />
+              </DialogContent>
+            </Dialog>
+
+            <Dialog open={openHelpDialog} onOpenChange={setOpenHelpDialog}>
+              <DialogTrigger asChild>
+                <Button variant="secondary" size="sm" className="bg-[#F1F3F5] hover:bg-[#E9ECEF] text-gray-700">
+                  <HelpCircle className="h-4 w-4" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="p-4 w-full h-full max-w-none max-h-none overflow-auto">
+                <div className="w-full h-full">
+                  <EstimatorDetailsPopup />
+                </div>
+              </DialogContent>
+            </Dialog>
+            {/*<Button
               variant="secondary"
               className="gap-1 bg-[#F1F3F5] text-gray-700 hover:bg-[#E9ECEF]"
               onClick={handleEstimateAI}
             >
               <Zap className="h-3 w-3" />
               Estimate with AI
-            </Button>
+            </Button>*/}
             <Button
               variant="secondary"
               className="bg-[#F1F3F5] text-gray-700 hover:bg-[#E9ECEF]"
