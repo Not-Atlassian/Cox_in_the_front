@@ -26,6 +26,9 @@ const EstimationPopup = ({ title, description, handleExit, setStoryPlates }: {
         }
     }
 
+    useEffect(() => {
+        getEstimation(title, description);
+    }, []);
 
     useEffect(() => {
         const asyncfunc =  async  () => {
@@ -35,7 +38,6 @@ const EstimationPopup = ({ title, description, handleExit, setStoryPlates }: {
                 displayMessage = "Unfortunately, story point estimation could not be performed on a ticket with no title.";
             }
             else {
-                await getEstimation(title, description);
                 if (storyPoints > 13) {
                     if (description === "") {
                         displayMessage = `Ticket with title "${title}" and no description is estimated to be too large. Consider breaking it down into smaller tickets.`;
@@ -57,12 +59,22 @@ const EstimationPopup = ({ title, description, handleExit, setStoryPlates }: {
                 }
             }
 
-            console.log("displayMessage", displayMessage);
-            console.log("estimation", estimation);
-            console.log("storyPoints", storyPoints);
-            console.log("storyPoints !== estimation", storyPoints !== estimation);
-            if (storyPoints > 0 && storyPoints !== estimation || title === "") {
-                setEstimation(storyPoints);
+            setEstimation(storyPoints);
+            // console.log("displayMessage", displayMessage);
+            // console.log("estimation", estimation);
+            // console.log("storyPoints", storyPoints);
+            // console.log("storyPoints !== estimation", storyPoints !== estimation);
+
+            // necessary condition in order to prevent duplicated triggers of useEffect to try to print 
+            // their respective messages
+            // estimation doesn't actually store anything besides 0 and 1, storyPoints is initialised 
+            // in AppContext with -1 and is set to -1 when no input is provided for the model
+            // I don't fully understand why it works, and I think that some things I do are not required, 
+            // but I shall not be the one to figure this out
+            if (estimation > 0 && storyPoints !== estimation || title === "" && storyPoints === -1) {
+                console.log("displayMessage", displayMessage);
+                console.log("estimation", estimation);
+                console.log("storyPoints", storyPoints);
                 let index = 0;
                 const typingInterval = setInterval(() => {
                     if (index < displayMessage.length + 1) {
@@ -74,12 +86,17 @@ const EstimationPopup = ({ title, description, handleExit, setStoryPlates }: {
                     }
                 }, 30);
 
-                return () => clearInterval(typingInterval);   
+                return () => clearInterval(typingInterval);
             }
         }
 
         asyncfunc();
-    }, [storyPoints]);
+    }, [title, description, storyPoints]);
+
+    useEffect(() => {
+        console.log("initialization")
+        setEstimation(1);
+    }, []);
 
     return (
         <div className="estimation-popup">
