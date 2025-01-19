@@ -53,7 +53,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [data, setData] = useState<any>(null);
   const [tickets, setTickets] = useState<any[]>([]);
   const [ticket, setTicket] = useState<any>(null);
-  const [storyPoints, setStoryPoints] = useState<number>(0);
+  const [storyPoints, setStoryPoints] = useState<number>(-1);
 
   useEffect(() => {
     const fetchData = async () => {
